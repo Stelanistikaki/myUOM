@@ -1,15 +1,16 @@
 <resources>
     <string name="app_name">MyUOM</string>
-    <!-- Strings related to login -->
+
     <string name="prompt_username">Όνομα Χρήστη</string>
     <string name="prompt_password">Συνθηματικό</string>
     <string name="action_sign_in">Σύνδεση</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">Πρέπει να συμπληρώσεις όλα τα πεδία</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="settings_text">Ρυθμίσεις</string>
+    <string name="lastname_text">Επώνυμο: </string>
+    <string name="firstname_text">Όνομα: </string>
+    <string name="aem_text">AEM: </string>
+    <string name="department_text">Τμήμα: </string>
+    <string name="semester_text">Εξάμηνο: </string>
+    <string name="direction_text">Κατεύθυνση: </string>
+
 </resources>

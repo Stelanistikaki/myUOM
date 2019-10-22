@@ -1,11 +1,9 @@
 package com.example.admin.myuom;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,9 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         String type = "login";
         BackgroundWorker backgroundWorker = new BackgroundWorker(this);
         backgroundWorker.execute(type, username, password);
-//        Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
-//        startActivity(intent);
-//        finish();
+        finish();
 
     }
 }

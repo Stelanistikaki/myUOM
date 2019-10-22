@@ -1,5 +1,6 @@
 package com.example.admin.myuom;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -21,6 +22,12 @@ class BackgroundWorker extends AsyncTask<String, String, String> {
     Context context;
     BackgroundWorker (Context ctx) {
         context = ctx;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        Toast toast = Toast.makeText(context, "Σύνδεση...", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
@@ -67,13 +74,17 @@ class BackgroundWorker extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        Toast toast = Toast.makeText(context, "Σύνδεση...", Toast.LENGTH_SHORT);
-        toast.show();
+        Intent intent;
+        Toast toast;
         if(result.equals("1")){
             toast = Toast.makeText(context, "Επιτυχής σύνδεση!", Toast.LENGTH_SHORT);
+            intent = new Intent(context, SettingsActivity.class);
         }else {
             toast = Toast.makeText(context, "Tα στοιχεία σου είναι λάθος", Toast.LENGTH_SHORT);
+            intent = new Intent(context, LoginActivity.class);
         }
         toast.show();
+        context.startActivity(intent);
+
     }
 }
