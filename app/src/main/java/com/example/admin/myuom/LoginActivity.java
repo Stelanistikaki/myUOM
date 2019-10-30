@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast toast;
             if (result.equals("1")) {
                 toast = Toast.makeText(context, "Επιτυχής σύνδεση!", Toast.LENGTH_SHORT);
-                intent = new Intent(context, SettingsActivity.class);
+                intent = new Intent(context, GradesActivity.class);
                 intent.putExtra("id", username);
             } else {
                 toast = Toast.makeText(context, "Tα στοιχεία σου είναι λάθος", Toast.LENGTH_SHORT);
