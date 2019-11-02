@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -17,11 +19,14 @@ import java.net.URLEncoder;
 public class SettingsActivity extends Activity {
 
     TextView aem, firstName, lastName, department, semester, direction;
+    Button gradesButton;
+    private Student theStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
 
         aem = (TextView) findViewById(R.id.aem);
         firstName = (TextView) findViewById(R.id.first_name);
@@ -29,11 +34,22 @@ public class SettingsActivity extends Activity {
         department = (TextView) findViewById(R.id.department);
         semester = (TextView) findViewById(R.id.semester);
         direction = (TextView) findViewById(R.id.direction);
+        gradesButton = (Button) findViewById(R.id.gradesBtn);
 
         Intent received = getIntent();
         String id = received.getStringExtra("id");
         BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(this);
         backgroundWorker.execute(id);
+
+        gradesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity.this, GradesActivity.class);
+                intent.putExtra("name", aem.getText().toString());
+                intent.putExtra("semester", semester.getText().toString());
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -50,7 +66,7 @@ public class SettingsActivity extends Activity {
             String id = strings[0];
             String data = null;
             String method = "POST";
-            String url = "http://192.168.2.4/myprograms/getStudentInfo.php";
+            String url = "http://192.168.2.7/myprograms/getStudentInfo.php";
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
             } catch (UnsupportedEncodingException e) {
