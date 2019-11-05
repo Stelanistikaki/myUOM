@@ -15,7 +15,7 @@ public class CustomAdapterList extends ArrayAdapter<Lesson> {
     int mResource;
 
     public CustomAdapterList(Context context, int resource, ArrayList<Lesson> data) {
-        super(context, R.layout.activity_grades, data);
+        super(context, R.layout.fragment_grades, data);
         this.dataSet = data;
         this.mContext=context;
         mResource = resource;

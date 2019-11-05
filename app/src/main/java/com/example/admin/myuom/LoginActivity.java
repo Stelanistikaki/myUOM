@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             username = strings[0];
             String password = strings[1];
             String method = "POST";
-            String url = "http://192.168.2.7/myprograms/login.php";
+            String url = "http://192.168.2.2/myprograms/login.php";
             String data = null;
             try {
                 data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8") + "&"
@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast toast;
             if (result.equals("1")) {
                 toast = Toast.makeText(context, "Επιτυχής σύνδεση!", Toast.LENGTH_SHORT);
-                intent = new Intent(context, SettingsActivity.class);
+                intent = new Intent(context, MainActivity.class);
                 intent.putExtra("id", username);
             } else {
                 toast = Toast.makeText(context, "Tα στοιχεία σου είναι λάθος", Toast.LENGTH_SHORT);

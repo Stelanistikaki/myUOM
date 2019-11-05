@@ -1,11 +1,14 @@
 package com.example.admin.myuom;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -16,41 +19,37 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class SettingsActivity extends Activity {
+@SuppressLint("ValidFragment")
+public class SettingsFragment extends Fragment {
 
     TextView aem, firstName, lastName, department, semester, direction;
-    Button gradesButton;
-    private Student theStudent;
+    View view;
+    Context context;
+    String id;
+
+    @SuppressLint("ValidFragment")
+    public SettingsFragment(String id) {
+        this.id = id;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
+        view = inflater.inflate(R.layout.fragment_settings, container, false);
+        aem = (TextView) view.findViewById(R.id.aem);
+        firstName = (TextView) view.findViewById(R.id.first_name);
+        lastName = (TextView) view.findViewById(R.id.last_name);
+        department = (TextView) view.findViewById(R.id.department);
+        semester = (TextView) view.findViewById(R.id.semester);
+        direction = (TextView) view.findViewById(R.id.direction);
 
-        aem = (TextView) findViewById(R.id.aem);
-        firstName = (TextView) findViewById(R.id.first_name);
-        lastName = (TextView) findViewById(R.id.last_name);
-        department = (TextView) findViewById(R.id.department);
-        semester = (TextView) findViewById(R.id.semester);
-        direction = (TextView) findViewById(R.id.direction);
-        gradesButton = (Button) findViewById(R.id.gradesBtn);
+       BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(context);
+       backgroundWorker.execute(id);
 
-        Intent received = getIntent();
-        String id = received.getStringExtra("id");
-        BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(this);
-        backgroundWorker.execute(id);
-
-        gradesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SettingsActivity.this, GradesActivity.class);
-                intent.putExtra("name", aem.getText().toString());
-                intent.putExtra("semester", semester.getText().toString());
-                startActivity(intent);
-            }
-        });
+        return view;
     }
+
 
 
     class BackgroundWorkerSettings extends AsyncTask<String, String, String> {
@@ -66,7 +65,7 @@ public class SettingsActivity extends Activity {
             String id = strings[0];
             String data = null;
             String method = "POST";
-            String url = "http://192.168.2.7/myprograms/getStudentInfo.php";
+            String url = "http://192.168.2.2/myprograms/getStudentInfo.php";
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -109,4 +108,6 @@ public class SettingsActivity extends Activity {
 
         }
     }
+
+
 }
