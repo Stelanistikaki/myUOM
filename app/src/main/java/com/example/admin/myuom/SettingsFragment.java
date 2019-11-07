@@ -65,7 +65,7 @@ public class SettingsFragment extends Fragment {
             String id = strings[0];
             String data = null;
             String method = "POST";
-            String url = "http://192.168.2.2/myprograms/getStudentInfo.php";
+            String url = "http://192.168.2.3/myprograms/getStudentInfo.php";
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
             } catch (UnsupportedEncodingException e) {

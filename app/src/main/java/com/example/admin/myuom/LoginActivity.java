@@ -22,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().hide();
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -53,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
             username = strings[0];
             String password = strings[1];
             String method = "POST";
-            String url = "http://192.168.2.2/myprograms/login.php";
+            String url = "http://192.168.2.3/myprograms/login.php";
             String data = null;
             try {
                 data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8") + "&"
