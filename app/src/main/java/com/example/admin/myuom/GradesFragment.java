@@ -1,10 +1,12 @@
 package com.example.admin.myuom;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +31,7 @@ public class GradesFragment extends Fragment {
     private String[] semesterString = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private String selectedSemester;
     View view;
-    Context context;
+    String id;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,18 +46,23 @@ public class GradesFragment extends Fragment {
                 (getContext(), android.R.layout.simple_spinner_item, semesterString);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         semesterSpinner.setAdapter(spinnerArrayAdapter);
-        semesterSpinner.setSelection(6);
 
-        BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(context);
-        backgroundWorkerGrades.execute("dai17000", semesterSpinner.getSelectedItem().toString());
+        // this = your fragment
+        SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        id = sp.getString("id", "");
+        int semester = sp.getInt("semester",0);
+        semesterSpinner.setSelection(semester-1);
+
+        BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(getContext());
+        backgroundWorkerGrades.execute(id, semesterSpinner.getSelectedItem().toString());
 
 
         semesterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long iD) {
                 selectedSemester = semesterSpinner.getSelectedItem().toString();
-                BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(context);
-                backgroundWorkerGrades.execute("dai17000", selectedSemester);
+                BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(getContext());
+                backgroundWorkerGrades.execute(id, selectedSemester);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
