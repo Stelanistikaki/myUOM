@@ -2,10 +2,12 @@ package com.example.admin.myuom;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +21,12 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-@SuppressLint("ValidFragment")
+
 public class SettingsFragment extends Fragment {
 
     TextView aem, firstName, lastName, department, semester, direction;
     View view;
-    Context context;
-    String id;
-
-    @SuppressLint("ValidFragment")
-    public SettingsFragment(String id) {
-        this.id = id;
-    }
+    SharedPreferences sp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,7 +40,11 @@ public class SettingsFragment extends Fragment {
         semester = (TextView) view.findViewById(R.id.semester);
         direction = (TextView) view.findViewById(R.id.direction);
 
-       BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(context);
+        // this = your fragment
+        sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        String id = sp.getString("id", "");
+
+       BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(getContext());
        backgroundWorker.execute(id);
 
         return view;
@@ -96,6 +96,7 @@ public class SettingsFragment extends Fragment {
                 }else
                     department.setText(s);
                 semester.setText(String.valueOf(jsonObject.getInt("semester")));
+                sp.edit().putInt("semester", jsonObject.getInt("semester")).apply();
                 s = jsonObject.getString("direction");
                 if(s.length()>13){
                     String str[] = s.split(" ");

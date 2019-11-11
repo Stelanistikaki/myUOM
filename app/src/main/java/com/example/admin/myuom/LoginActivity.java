@@ -2,9 +2,11 @@ package com.example.admin.myuom;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -17,12 +19,21 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI references.
     private EditText mPasswordView, mUsernameView;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
+
+        sp = getSharedPreferences("pref",MODE_PRIVATE);
+
+        //false is the default value for booleans
+        if(sp.getBoolean("logged",false)) {
+            goToMainActivity();
+            finish();
+        }
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -37,6 +48,11 @@ public class LoginActivity extends AppCompatActivity {
         backgroundWorker.execute(username, password);
 
         finish();
+    }
+
+    public void goToMainActivity(){
+        Intent i = new Intent(this,MainActivity.class);
+        startActivity(i);
     }
 
 
@@ -74,14 +90,14 @@ public class LoginActivity extends AppCompatActivity {
             Toast toast;
             if (result.equals("1")) {
                 toast = Toast.makeText(context, "Επιτυχής σύνδεση!", Toast.LENGTH_SHORT);
-                intent = new Intent(context, MainActivity.class);
-                intent.putExtra("id", username);
+                sp.edit().putBoolean("logged",true).apply();
+                sp.edit().putString("id", username).apply();
+                goToMainActivity();
             } else {
                 toast = Toast.makeText(context, "Tα στοιχεία σου είναι λάθος", Toast.LENGTH_SHORT);
                 intent = new Intent(context, LoginActivity.class);
             }
             toast.show();
-            context.startActivity(intent);
 
         }
     }

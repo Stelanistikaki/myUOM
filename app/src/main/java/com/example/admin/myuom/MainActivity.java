@@ -1,17 +1,17 @@
 package com.example.admin.myuom;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
-import android.view.View;
-
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -22,25 +22,41 @@ import android.support.v4.widget.DrawerLayout;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private String id;
-    Toolbar toolbar;
+    private TextView toolbarΤitle;
+    private CharSequence mTitle;
+    SharedPreferences sp;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        sp = getSharedPreferences("pref",MODE_PRIVATE);
 
-        Intent received = getIntent();
-        id = received.getStringExtra("id");
+//        Window window = this.getWindow();
+//
+//        // clear FLAG_TRANSLUCENT_STATUS flag:
+//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//
+//        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//
+//        // finally change the color
+//        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
+
+        toolbarΤitle = (TextView) findViewById(R.id.titleToolbar);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        toolbarΤitle.setText("Νέα Παμακ");
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -85,11 +101,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //initializing the fragment object which is selected
         switch (menuItem.getItemId()) {
             case R.id.nav_settings:
-                fragment = new SettingsFragment(id);
+                fragment = new SettingsFragment();
                 break;
             case R.id.nav_grades:
                 fragment = new GradesFragment();
                 break;
+            case R.id.nav_uomNews:
+                fragment = new NewsFragment();
+                break;
+            case R.id.nav_compus:
+                fragment = new CompusFragment();
+                break;
+            case R.id.nav_logout:
+                sp.edit().putBoolean("logged",false).apply();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+
         }
 
         //replacing the fragment
@@ -101,6 +130,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        toolbarΤitle.setText(menuItem.getTitle());
         return true;
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        toolbarΤitle.setText(mTitle);
     }
 }
