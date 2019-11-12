@@ -4,18 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import com.example.admin.myuom.dummy.DummyContent;
-import com.example.admin.myuom.dummy.DummyContent.DummyItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,10 +30,7 @@ import java.util.List;
 
 public class NewsFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    private int mColumnCount = 1;
     private ListView newsList;
-    Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +40,7 @@ public class NewsFragment extends Fragment {
         newsList = view.findViewById(R.id.news_list);
 
 
-        BackgroundWorkerNews backgroundWorkerNews = new BackgroundWorkerNews(context);
+        BackgroundWorkerNews backgroundWorkerNews = new BackgroundWorkerNews(getContext());
         backgroundWorkerNews.execute();
 
         return view;

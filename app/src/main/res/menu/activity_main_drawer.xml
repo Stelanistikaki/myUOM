@@ -16,6 +16,10 @@
             android:id="@+id/nav_grades"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_grades" />
+        <item
+            android:id="@+id/nav_program"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_program" />
     </group>
 
     <item android:title="Λογαριασμος">
