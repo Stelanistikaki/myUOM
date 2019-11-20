@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
             username = strings[0];
             String password = strings[1];
             String method = "POST";
-            String url = "http://192.168.2.3/myprograms/login.php";
+            String url = "http://192.168.2.5/myprograms/login.php";
             String data = null;
             try {
                 data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8") + "&"

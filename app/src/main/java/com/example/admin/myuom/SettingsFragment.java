@@ -65,7 +65,7 @@ public class SettingsFragment extends Fragment {
             String id = strings[0];
             String data = null;
             String method = "POST";
-            String url = "http://192.168.2.3/myprograms/getStudentInfo.php";
+            String url = "http://192.168.2.5/myprograms/getStudentInfo.php";
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -98,10 +98,11 @@ public class SettingsFragment extends Fragment {
                 semester.setText(String.valueOf(jsonObject.getInt("semester")));
                 sp.edit().putInt("semester", jsonObject.getInt("semester")).apply();
                 s = jsonObject.getString("direction");
-                if(s.length()>13){
-                    String str[] = s.split(" ");
-                    direction.setText(str[0]+"\n"+str[1]);
-                }else
+                sp.edit().putString("direction", s).apply();
+//                if(s.length()>13){
+//                    String str[] = s.split(" ");
+//                    direction.setText(str[0]+"\n"+str[1]);
+//                }else
                     direction.setText(s);
             } catch (JSONException e) {
                 e.printStackTrace();

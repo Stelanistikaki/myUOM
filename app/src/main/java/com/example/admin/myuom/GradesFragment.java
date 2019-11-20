@@ -85,7 +85,7 @@ public class GradesFragment extends Fragment {
             String id = strings[0];
             String semester = strings[1];
             String method = "POST";
-            String url = "http://192.168.2.3/myprograms/getGrades.php";
+            String url = "http://192.168.2.5/myprograms/getGrades.php";
             String data = null;
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"

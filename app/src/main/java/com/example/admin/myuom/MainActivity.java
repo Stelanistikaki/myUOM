@@ -41,16 +41,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         sp = getSharedPreferences("pref",MODE_PRIVATE);
 
-        Window window = this.getWindow();
-
-        // clear FLAG_TRANSLUCENT_STATUS flag:
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
+//        Window window = this.getWindow();
+//
+//        // clear FLAG_TRANSLUCENT_STATUS flag:
+//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//
+//        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//
+//        // finally change the color
+//        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
 
         toolbarΤitle = (TextView) findViewById(R.id.titleToolbar);
 
