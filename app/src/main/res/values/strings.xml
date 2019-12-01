@@ -12,6 +12,11 @@
     <string name="department_text">Τμήμα: </string>
     <string name="semester_text">Εξάμηνο: </string>
     <string name="direction_text">Κατεύθυνση: </string>
+    <string name="address_text">Διεύθυνση: </string>
+    <string name="changeAddress">Αλλαγή </string>
+    <string name="notifications_text">Ειδοποιήσεις </string>
+    <string name="notifications_time_text1">Να ειδοποιούμαι </string>
+    <string name="notifications_time_text2">πριν το μάθημα </string>
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
