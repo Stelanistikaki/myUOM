@@ -20,12 +20,17 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 
 public class SettingsFragment extends Fragment {
@@ -129,7 +134,7 @@ public class SettingsFragment extends Fragment {
             String id = strings[0];
             String data = null;
             String method = "POST";
-            String url = "http://192.168.2.7/myprograms/getStudentInfo.php";
+            String url = "http://192.168.2.4/myprograms/getStudentInfo.php";
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -143,35 +148,22 @@ public class SettingsFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            JSONObject jsonObject = null;
+            Gson gson = new Gson();
+            Student student = gson.fromJson(result, Student.class);
 
-            try {
-                JSONObject obj = new JSONObject(result);
-                JSONArray jsonArray = obj.getJSONArray("student");
-
-                jsonObject = jsonArray.getJSONObject(0);
-                aem.setText(jsonObject.getString("id"));
-                lastName.setText(jsonObject.getString("last_name"));
-                firstName.setText(jsonObject.getString("first_name"));
-                String s = jsonObject.getString("department");
-                if(s.length()>13){
-                    String str[] = s.split(" ");
-                    department.setText(str[0]+"\n"+str[1]);
-                }else
-                    department.setText(s);
-                semester.setText(String.valueOf(jsonObject.getInt("semester")));
-                sp.edit().putInt("semester", jsonObject.getInt("semester")).apply();
-                s = jsonObject.getString("direction");
-                sp.edit().putString("direction", s).apply();
-//                if(s.length()>13){
-//                    String str[] = s.split(" ");
-//                    direction.setText(str[0]+"\n"+str[1]);
-//                }else
-                    direction.setText(s);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            aem.setText(student.getAem());
+            lastName.setText(student.getLastName());
+            firstName.setText(student.getFirstName());
+            String s = student.getDepartment();
+            if (s.length() > 13) {
+                String str[] = s.split(" ");
+                department.setText(str[0] + "\n" + str[1]);
+            } else
+                department.setText(s);
+            semester.setText(String.valueOf(student.getSemester()));
+            sp.edit().putInt("semester", student.getSemester()).apply();
+            sp.edit().putString("direction", student.getDirection()).apply();
+            direction.setText(student.getDirection());
         }
     }
 

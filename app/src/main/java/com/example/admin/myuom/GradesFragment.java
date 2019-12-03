@@ -15,13 +15,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class GradesFragment extends Fragment {
@@ -85,7 +90,7 @@ public class GradesFragment extends Fragment {
             String id = strings[0];
             String semester = strings[1];
             String method = "POST";
-            String url = "http://192.168.2.5/myprograms/getGrades.php";
+            String url = "http://192.168.2.4/myprograms/getGrades.php";
             String data = null;
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"
@@ -102,23 +107,9 @@ public class GradesFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
 
-            JSONObject jsonObject = null;
-            ArrayList<Lesson> data = new ArrayList<>();
-            try {
-                JSONObject obj = new JSONObject(result);
-                JSONArray jsonArray = obj.getJSONArray("grades");
-
-                for(int i=0; i < jsonArray.length(); i++) {
-                    jsonObject = jsonArray.getJSONObject(i);
-                    Lesson theLesson = new Lesson();
-                    theLesson.setName(jsonObject.getString("name"));
-                    theLesson.setGrade(jsonObject.getString("grade"));
-                    data.add(theLesson);
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<Lesson>>(){}.getType();
+            ArrayList<Lesson> data = gson.fromJson(result, listType);
 
             CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.custom_list_item, data);
             gradeList.setAdapter(adapter);

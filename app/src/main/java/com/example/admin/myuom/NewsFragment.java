@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -85,17 +89,21 @@ public class NewsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
 
-            JSONObject jsonObject = null;
-            ArrayList<String> data = new ArrayList<>();
+          //  JSONObject jsonObject = null;
+          //  ArrayList<String> data = new ArrayList<>();
+            ArrayList<Post> data = null;
             try {
                 JSONObject obj = new JSONObject(result);
                 JSONArray jsonArray = obj.getJSONArray("items");
-
-                for(int i=0; i < jsonArray.length(); i++) {
-                    jsonObject = jsonArray.getJSONObject(i);
-                    data.add(jsonObject.getString("title"));
-                }
-
+                Gson gson = new Gson();
+                Type listType = new TypeToken<ArrayList<Post>>(){}.getType();
+                data = gson.fromJson(jsonArray.toString(), listType);
+//
+//                for(int i=0; i < jsonArray.length(); i++) {
+//                    jsonObject = jsonArray.getJSONObject(i);
+//                    data.add(jsonObject.getString("title"));
+//                }
+//
             } catch (JSONException e) {
                 e.printStackTrace();
             }
