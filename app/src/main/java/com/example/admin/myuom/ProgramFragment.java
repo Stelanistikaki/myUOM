@@ -178,7 +178,7 @@ public class ProgramFragment extends Fragment {
             String semester = strings[1];
             String direction = strings[2];
             String method = "POST";
-            String url = "http://192.168.2.5/myprograms/getLessons.php";
+            String url = "http://192.168.2.4/myprograms/getLessons.php";
             String data = null;
             try {
                 data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"
@@ -189,7 +189,6 @@ public class ProgramFragment extends Fragment {
             }
             Connector connector = new Connector();
             String result = connector.connect(method, url, data);
-            Log.d("STELA", result);
             return result;
         }
 

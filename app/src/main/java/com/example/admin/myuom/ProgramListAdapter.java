@@ -33,9 +33,11 @@ public class ProgramListAdapter extends ArrayAdapter<Program> {
 
         TextView timeText = (TextView) convertView.findViewById(R.id.timeText);
         TextView lessonTitleText = (TextView) convertView.findViewById(R.id.lessonText);
+        TextView classText = (TextView) convertView.findViewById(R.id.classText);
 
         timeText.setText(theProgram.getTime());
         lessonTitleText.setText(theProgram.getTitle());
+        classText.setText(theProgram.getClassroom());
 
         return convertView;
     }

@@ -1,14 +1,22 @@
 package com.example.admin.myuom;
 
+import android.util.Log;
+
 class Program {
-    private String title, time;
+    private String title, time, classroom;
 
     public void setTime(String time) {
-        this.time = time;
+        String theTime[] = time.split("-");
+        this.time = theTime[0]+ ":00";
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        String theTitle[] = title.split("-");
+        setClassroom(theTitle[3]);
+        this.title = theTitle[0];
+    }
+    public void setClassroom(String classroom){
+        this.classroom = classroom;
     }
 
     public String getTime() {
@@ -17,5 +25,9 @@ class Program {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getClassroom() {
+        return classroom;
     }
 }

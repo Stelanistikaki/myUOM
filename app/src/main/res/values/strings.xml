@@ -24,6 +24,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="default_notification_channel_id">1</string>
 
     <string name="menu_uomNews">Νέα ΠαΜακ</string>
     <string name="menu_compus">Compus</string>
