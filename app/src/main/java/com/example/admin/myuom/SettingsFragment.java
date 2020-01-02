@@ -1,12 +1,12 @@
 package com.example.admin.myuom;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,27 +19,28 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 
 
 public class SettingsFragment extends Fragment {
 
     TextView aem, firstName, lastName, department, semester, direction;
-    EditText address;
     Spinner timeSpinner;
     Switch notificationSwitch;
-    Button changeAddress;
     View view;
     SharedPreferences sp;
 
@@ -56,9 +57,7 @@ public class SettingsFragment extends Fragment {
         department = (TextView) view.findViewById(R.id.department);
         semester = (TextView) view.findViewById(R.id.semester);
         direction = (TextView) view.findViewById(R.id.direction);
-        address = view.findViewById(R.id.addressSetting);
         timeSpinner = view.findViewById(R.id.timeSpinner);
-        changeAddress = view.findViewById(R.id.changeAddress);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
 
 
@@ -70,21 +69,31 @@ public class SettingsFragment extends Fragment {
         // this = your fragment
         sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         String id = sp.getString("id", "");
-        String addressText = sp.getString("address", "");
-        address.setText(addressText);
-
+        aem.setText(id);
 
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     sp.edit().putBoolean("notifications", true).apply();
+                    timeSpinner.setEnabled(true);
                 }else{
                     sp.edit().putBoolean("notifications", false).apply();
+                    //the user cannot choose time if there are not notifications
+                    timeSpinner.setEnabled(false);
                 }
             }
         });
 
         Boolean notificationsBool = sp.getBoolean("notifications", false);
+        int timeNotification = sp.getInt("notificationTime", 0);
+        //set the time according to what the user chose
+        if(timeNotification == 30){
+            timeSpinner.setSelection(0);
+        }else if(timeNotification == 1){
+            timeSpinner.setSelection(1);
+        }else{
+            timeSpinner.setSelection(2);
+        }
 
         if(notificationsBool){
             notificationSwitch.setChecked(true);
@@ -105,66 +114,55 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        changeAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String addressString = address.getText().toString();
-                sp.edit().putString("address", addressString).apply();
-
-                address.setText(sp.getString("address", ""));
-            }
-        });
-
-       BackgroundWorkerSettings backgroundWorker = new BackgroundWorkerSettings(getContext());
-       backgroundWorker.execute(id);
+        try {
+            run(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return view;
     }
 
-    class BackgroundWorkerSettings extends AsyncTask<String, String, String> {
+    public void run(String id){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/student/"+ id)
+                .build();
 
-        Context context;
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
 
-        BackgroundWorkerSettings(Context ctx) {
-            context = ctx;
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String id = strings[0];
-            String data = null;
-            String method = "POST";
-            String url = "http://192.168.2.4/myprograms/getStudentInfo.php";
-            try {
-                data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
             }
-            Connector connector = new Connector();
-            String result = connector.connect(method, url, data);
 
-            return result;
-        }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                Gson gson = new Gson();
 
-        @Override
-        protected void onPostExecute(String result) {
-            Gson gson = new Gson();
-            Student student = gson.fromJson(result, Student.class);
+                ResponseBody responseBody = response.body();
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-            aem.setText(student.getAem());
-            lastName.setText(student.getLastName());
-            firstName.setText(student.getFirstName());
-            String s = student.getDepartment();
-            if (s.length() > 13) {
-                String str[] = s.split(" ");
-                department.setText(str[0] + "\n" + str[1]);
-            } else
-                department.setText(s);
-            semester.setText(String.valueOf(student.getSemester()));
-            sp.edit().putInt("semester", student.getSemester()).apply();
-            sp.edit().putString("direction", student.getDirection()).apply();
-            direction.setText(student.getDirection());
-        }
+                  Student student = gson.fromJson(responseBody.string(), Student.class);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lastName.setText(student.getLastName());
+                        firstName.setText(student.getFirstName());
+                        String s = student.getDepartment();
+                        if (s.length() > 13) {
+                            String str[] = s.split(" ");
+                            department.setText(str[0] + "\n" + str[1]);
+                        } else
+                            department.setText(s);
+                        semester.setText(String.valueOf(student.getSemester()));
+                        sp.edit().putInt("semester", student.getSemester()).apply();
+                        sp.edit().putString("direction", student.getDirection()).apply();
+                        direction.setText(student.getDirection());
+                    }
+                });
+            }
+        });
     }
 
 
