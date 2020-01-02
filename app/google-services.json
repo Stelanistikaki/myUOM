@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "821895647394",
+    "firebase_url": "https://myuom-f49f5.firebaseio.com",
+    "project_id": "myuom-f49f5",
+    "storage_bucket": "myuom-f49f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821895647394:android:270401c60811d83b8187fb",
+        "android_client_info": {
+          "package_name": "com.example.admin.myuom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "821895647394-rd4nnvctucf520fl0o8ac4ncf8p8nlcr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.admin.myuom",
+            "certificate_hash": "b8dcd7fb81ce315a42553442e5b8c1fdc1777437"
+          }
+        },
+        {
+          "client_id": "821895647394-pv2a8rufc8nb37hdvlk00ngrj3dvm24a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6OhKptr4PU6iTX6ppg-YwIgVOlMlJvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "821895647394-pv2a8rufc8nb37hdvlk00ngrj3dvm24a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

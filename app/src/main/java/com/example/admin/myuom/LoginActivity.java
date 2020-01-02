@@ -3,26 +3,34 @@ package com.example.admin.myuom;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
-import java.net.ContentHandler;
-import java.net.URLEncoder;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.IOException;
 
 
 public class LoginActivity extends AppCompatActivity {
 
     // UI references.
     private EditText mPasswordView, mUsernameView;
+    private Button loginButton;
     SharedPreferences sp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,46 +49,21 @@ public class LoginActivity extends AppCompatActivity {
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
+        loginButton = findViewById(R.id.sign_in_button);
 
-//        try {
-//
-//            // Assume that Moovit app exists. If not, exception will occur
-//
-//            PackageManager pm = getPackageManager();
-//
-//            pm.getPackageInfo("com.tranzmate", PackageManager.GET_ACTIVITIES);
-//
-//            String uri = "moovit://directions?dest_lat=40.63314&dest_lon=22.94937&dest_name=Εγνατία165&orig_lat=&orig_lon=&orig_name=&date=&partner_id=<YOUR_APP_NAME>";
-//
-//            Intent intent = new Intent(Intent.ACTION_VIEW);
-//
-//            intent.setData(Uri.parse(uri));
-//
-//            startActivity(intent);
-//
-//        } catch (PackageManager.NameNotFoundException e) {
-//
-//            // Moovit not installed - send to store
-//
-//            String url = "https://app.appsflyer.com/id498477945?pid=DL&c=<YOUR_APP_NAME>";
-//
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//
-//            i.setData(Uri.parse(url));
-//
-//            startActivity(i);
-//
-//        }
-    }
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = mUsernameView.getText().toString();
+                String password = mPasswordView.getText().toString();
 
-    public void OnLogin(View view) {
-        String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        BackgroundWorkerLogin backgroundWorker = new BackgroundWorkerLogin(this);
-        backgroundWorker.execute(username, password);
-
-        finish();
+                try {
+                    run(username, password);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void goToMainActivity(){
@@ -88,51 +71,52 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    public void run(String username, String password) throws Exception {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/login/"+ username)
+                .build();
 
-    class BackgroundWorkerLogin extends AsyncTask<String, String, String> {
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
 
-        Context context;
-        String username;
-
-        BackgroundWorkerLogin(Context ctx) {
-            context = ctx;
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            username = strings[0];
-            String password = strings[1];
-            String method = "POST";
-            String url = "http://192.168.2.4/myprograms/login.php";
-            String data = null;
-            try {
-                data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8") + "&"
-                        + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
             }
-            Connector connector = new Connector();
-            String result = connector.connect(method, url, data);
 
-            return result;
-        }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String thePassword = null;
+                Intent intent;
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+                    try {
+                        JSONObject jsonResponse = new JSONObject(responseBody.string());
+                        thePassword = jsonResponse.getString("password");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String text;
+                    if(password.equals(thePassword)){
+                        text = "Επιτυχής σύνδεση! ";
+                        sp.edit().putBoolean("logged",true).apply();
+                        sp.edit().putString("id", username).apply();
+                        goToMainActivity();
+                        finish();
+                    }else {
+                        text = "Tα στοιχεία σου είναι λάθος ";
+                        intent = new Intent(LoginActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
 
-        @Override
-        protected void onPostExecute(String result) {
-            Intent intent;
-            Toast toast;
-            if (result.equals("1")) {
-                toast = Toast.makeText(context, "Επιτυχής σύνδεση!", Toast.LENGTH_SHORT);
-                sp.edit().putBoolean("logged",true).apply();
-                sp.edit().putString("id", username).apply();
-                goToMainActivity();
-            } else {
-                toast = Toast.makeText(context, "Tα στοιχεία σου είναι λάθος", Toast.LENGTH_SHORT);
-                intent = new Intent(context, LoginActivity.class);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
             }
-            toast.show();
-
-        }
+        });
     }
 }
 
