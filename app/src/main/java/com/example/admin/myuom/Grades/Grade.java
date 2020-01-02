@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Grades;
 
 public class Grade {
 

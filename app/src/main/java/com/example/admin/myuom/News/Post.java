@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.News;
 
 public class Post {
     private String title;

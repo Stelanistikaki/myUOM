@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Notification;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;

@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Settings;
 
 class Student {
     private String last_name, first_name, department, direction;

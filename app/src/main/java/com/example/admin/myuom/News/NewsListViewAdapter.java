@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.News;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.admin.myuom.R;
+
 import java.util.ArrayList;
 
 public class NewsListViewAdapter extends ArrayAdapter<Post> {

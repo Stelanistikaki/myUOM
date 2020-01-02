@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Notification;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -12,7 +12,9 @@ import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
+
+import com.example.admin.myuom.R;
+
 import java.util.Calendar;
 
 import androidx.core.app.NotificationCompat;

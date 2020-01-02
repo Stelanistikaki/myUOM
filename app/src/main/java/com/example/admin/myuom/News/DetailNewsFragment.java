@@ -1,10 +1,12 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.News;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+
+import com.example.admin.myuom.R;
 
 import androidx.fragment.app.Fragment;
 
