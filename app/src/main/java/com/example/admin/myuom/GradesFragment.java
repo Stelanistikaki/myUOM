@@ -1,11 +1,12 @@
 package com.example.admin.myuom;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,19 +15,26 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class GradesFragment extends Fragment {
@@ -35,8 +43,10 @@ public class GradesFragment extends Fragment {
     private Spinner semesterSpinner;
     private String[] semesterString = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private String selectedSemester;
+    private ArrayList<Lesson> lessons ;
+    private ArrayList<Grade> grades;
     View view;
-    String id;
+    String id, direction;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,19 +65,18 @@ public class GradesFragment extends Fragment {
         // this = your fragment
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         id = sp.getString("id", "");
+        direction = sp.getString("direction", "");
         int semester = sp.getInt("semester",0);
         semesterSpinner.setSelection(semester-1);
 
-        BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(getContext());
-        backgroundWorkerGrades.execute(id, semesterSpinner.getSelectedItem().toString());
 
+       // run(id, semester, direction);
 
         semesterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long iD) {
                 selectedSemester = semesterSpinner.getSelectedItem().toString();
-                BackgroundWorkerGrades backgroundWorkerGrades = new BackgroundWorkerGrades(getContext());
-                backgroundWorkerGrades.execute(id, selectedSemester);
+                run(id, Integer.valueOf(selectedSemester), direction);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -78,44 +87,97 @@ public class GradesFragment extends Fragment {
         return view;
     }
 
-    class BackgroundWorkerGrades extends AsyncTask<String, String, String> {
+    public void run(String username, int semester, String direction){
+        OkHttpClient client = new OkHttpClient();
+        lessons = new ArrayList<>();
+        grades = new ArrayList<>();
 
-        Context context;
-        BackgroundWorkerGrades(Context ctx) {
-            context = ctx;
-        }
+        Request requestLessons = new Request.Builder()
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
+                .build();
 
-        @Override
-        protected String doInBackground(String... strings) {
-            String id = strings[0];
-            String semester = strings[1];
-            String method = "POST";
-            String url = "http://192.168.2.4/myprograms/getGrades.php";
-            String data = null;
-            try {
-                data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"
-                        + URLEncoder.encode("semester", "UTF-8") + "=" + URLEncoder.encode(semester, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        client.newCall(requestLessons).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+
             }
-            Connector connector = new Connector();
-            String result = connector.connect(method, url, data);
 
-            return result;
-        }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                ResponseBody responseBody = response.body();
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-        @Override
-        protected void onPostExecute(String result) {
+                try {
+                    JSONObject obj = new JSONObject(responseBody.string());
+                    JSONObject semObj = obj.getJSONObject(String.valueOf(semester));
+                    JSONObject lessonObj = semObj.getJSONObject(direction);
+                    for(int i=0; i<lessonObj.names().length();i++){
+                        Lesson aLesson = new Lesson();
+                        String id = lessonObj.names().get(i).toString();
+                        aLesson.setId(id);
+                        JSONObject lesson = lessonObj.getJSONObject(id);
+                        aLesson.setName(lesson.getString("name"));
+                        lessons.add(aLesson);
+                    }
+                    lessonObj = semObj.getJSONObject("ΕΠΔΤ");
+                    for(int i=0; i<lessonObj.names().length();i++){
+                        Lesson aLesson = new Lesson();
+                        String id = lessonObj.names().get(i).toString();
+                        aLesson.setId(id);
+                        JSONObject lesson = lessonObj.getJSONObject(id);
+                        aLesson.setName(lesson.getString("name"));
+                        lessons.add(aLesson);
+                    }
 
-            Gson gson = new Gson();
-            Type listType = new TypeToken<ArrayList<Lesson>>(){}.getType();
-            ArrayList<Lesson> data = gson.fromJson(result, listType);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.custom_list_item, data);
-            gradeList.setAdapter(adapter);
+                Request requestGrade = new Request.Builder()
+                        .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+ username)
+                        .build();
 
+                client.newCall(requestGrade).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Request request, IOException e) {
 
-        }
+                    }
+
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+                        ResponseBody responseBody = response.body();
+                        JSONObject obj = null;
+                        try {
+                            obj = new JSONObject(responseBody.string());
+
+                            for(int i=0; i<obj.names().length();i++){
+                                for(int j=0; j<lessons.size();j++){
+                                    if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
+                                        Grade grade = new Grade();
+                                        String id_lesson = obj.names().get(i).toString();
+                                        JSONObject gradeobj = obj.getJSONObject(id_lesson);
+                                        grade.setGrade(gradeobj.getString("grade"));
+                                        grade.setName(lessons.get(j).getName());
+                                        grades.add(grade);
+                                    }
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.custom_list_item, grades);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override public void run() {
+                                gradeList.setAdapter(adapter);
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
+
     }
 
 

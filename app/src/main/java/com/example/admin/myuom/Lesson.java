@@ -2,7 +2,7 @@ package com.example.admin.myuom;
 
 public class Lesson {
 
-    private String name, grade;
+    private String name, id_lesson;
 
     public String getName() {
         return name;
@@ -12,11 +12,11 @@ public class Lesson {
         this.name = name;
     }
 
-    public String getGrade() {
-        return grade;
+    public String getId() {
+        return id_lesson;
     }
 
-    public void setGrade(String grade) {
-        this.grade = grade;
+    public void setId(String id) {
+        this.id_lesson = id;
     }
 }

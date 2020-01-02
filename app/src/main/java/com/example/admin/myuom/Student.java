@@ -1,12 +1,8 @@
 package com.example.admin.myuom;
 
 class Student {
-    private String id,last_name, first_name, department, direction;
+    private String last_name, first_name, department, direction;
     private int semester;
-
-    public void setAem(String aem) {
-        this.id = aem;
-    }
 
     public void setLastname(String last_name) {
         this.last_name = last_name;
@@ -26,10 +22,6 @@ class Student {
 
     public void setDirection(String direction) {
         this.direction = direction;
-    }
-
-    public String getAem() {
-        return id;
     }
 
     public String getFirstName() {

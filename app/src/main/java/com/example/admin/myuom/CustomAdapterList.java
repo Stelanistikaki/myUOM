@@ -9,12 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CustomAdapterList extends ArrayAdapter<Lesson> {
-    private ArrayList<Lesson> dataSet;
+public class CustomAdapterList extends ArrayAdapter<Grade> {
+    private ArrayList<Grade> dataSet;
     Context mContext;
     int mResource;
 
-    public CustomAdapterList(Context context, int resource, ArrayList<Lesson> data) {
+    public CustomAdapterList(Context context, int resource, ArrayList<Grade> data) {
         super(context, R.layout.fragment_grades, data);
         this.dataSet = data;
         this.mContext=context;
@@ -24,7 +24,7 @@ public class CustomAdapterList extends ArrayAdapter<Lesson> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Lesson lesson = dataSet.get(position);
+        Grade grade = dataSet.get(position);
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mResource, parent, false);
@@ -32,8 +32,8 @@ public class CustomAdapterList extends ArrayAdapter<Lesson> {
         TextView lessonText = (TextView) convertView.findViewById(R.id.lessonText);
         TextView gradeText = (TextView) convertView.findViewById(R.id.gradeText);
 
-        lessonText.setText(lesson.getName());
-        gradeText.setText(lesson.getGrade());
+        lessonText.setText(grade.getName());
+        gradeText.setText(grade.getGrade());
 
         return convertView;
     }
