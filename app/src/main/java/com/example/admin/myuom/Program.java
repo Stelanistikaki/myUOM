@@ -6,7 +6,7 @@ class Program {
     private String title, time, classroom;
 
     public void setTime(String time) {
-        String theTime[] = time.split("-");
+        String theTime[] = time.split(" -");
         this.time = theTime[0]+ ":00";
     }
 

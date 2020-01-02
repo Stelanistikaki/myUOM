@@ -1,11 +1,15 @@
 package com.example.admin.myuom;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,7 +21,7 @@ public class ProgramListAdapter extends ArrayAdapter<Program> {
     int mResource;
 
     public ProgramListAdapter(Context context, int resource, ArrayList<Program> data) {
-        super(context, R.layout.fragment_news, data);
+        super(context, R.layout.fragment_program_list, data);
         this.dataSet = data;
         this.mContext=context;
         mResource = resource;
@@ -33,8 +37,9 @@ public class ProgramListAdapter extends ArrayAdapter<Program> {
 
         TextView timeText = (TextView) convertView.findViewById(R.id.timeText);
         TextView lessonTitleText = (TextView) convertView.findViewById(R.id.lessonText);
-        TextView classText = (TextView) convertView.findViewById(R.id.classText);
+        TextView classText = convertView.findViewById(R.id.classText);
 
+        //set the textviews and the text for button
         timeText.setText(theProgram.getTime());
         lessonTitleText.setText(theProgram.getTitle());
         classText.setText(theProgram.getClassroom());

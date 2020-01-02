@@ -2,10 +2,9 @@ package com.example.admin.myuom;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,16 +13,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class ProgramFragment extends Fragment {
@@ -32,7 +33,9 @@ public class ProgramFragment extends Fragment {
     private Spinner programSpinner;
     String id, direction;
     int semester;
+    String dayOfWeek;
     String selectedDay,selectedDay2="",selectedDay3="";
+    ArrayList<String> lessons;
     private String[] programString = {"Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή"};
 
     @Override
@@ -49,14 +52,41 @@ public class ProgramFragment extends Fragment {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         programSpinner.setAdapter(spinnerArrayAdapter);
 
+        //set the spinner in the current day
+        Calendar calendar = Calendar.getInstance();
+        dayOfWeek = getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK));
+        int selection = 0;
+        switch (dayOfWeek) {
+            case "ΔΕΥΤΕΡΑ":
+                selectedDay = dayOfWeek;
+                selection = 0;
+                break;
+            case "ΤΡΙΤΗ":
+                selectedDay = dayOfWeek;
+                selection = 1;
+                break;
+            case "ΤΕΤΑΡΤΗ":
+                selectedDay = dayOfWeek;
+                selection = 2;
+                break;
+            case "ΠΕΜΠΤΗ":
+                selectedDay = dayOfWeek;
+                selection = 3;
+                break;
+            case "ΠΑΡΑΣΚΕΥΗ":
+                selectedDay = dayOfWeek;
+                selection = 4;
+                break;
+            default: //the default is for Sunday and Saturday
+                selection=0;
+        }
+        programSpinner.setSelection(selection);
+
         // this = your fragment
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         id = sp.getString("id", "");
         semester = sp.getInt("semester",0);
         direction = sp.getString("direction", "");
-
-        BackgroundWorkerProgram backgroundWorkerGrades = new BackgroundWorkerProgram(getContext());
-        backgroundWorkerGrades.execute(id, String.valueOf(semester), direction);
 
 
         programSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -84,8 +114,7 @@ public class ProgramFragment extends Fragment {
                     selectedDay2 = "";
                     selectedDay3 = "";
                 }
-                BackgroundWorkerProgram backgroundWorkerGrades = new BackgroundWorkerProgram(getContext());
-                backgroundWorkerGrades.execute(id, String.valueOf(semester), direction);
+                run(id, String.valueOf(semester), direction);
 
             }
             @Override
@@ -95,6 +124,53 @@ public class ProgramFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void run(String username, String semester, String direction){
+        OkHttpClient client = new OkHttpClient();
+
+        Request requestLessons = new Request.Builder()
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
+                .build();
+
+        client.newCall(requestLessons).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                lessons = new ArrayList<String>();
+                ResponseBody responseBody = response.body();
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                JSONObject jsonObject = null;
+
+                try {
+                    JSONObject obj = new JSONObject(responseBody.string());
+                    JSONObject semObj = obj.getJSONObject(String.valueOf(semester));
+                    JSONObject directionObj = semObj.getJSONObject(direction);
+
+                    for(int i=0; i<directionObj.names().length();i++){
+                       lessons.add(directionObj.names().get(i).toString());
+                    }
+                    directionObj = semObj.getJSONObject("ΕΠΔΤ");
+                    for(int i=0; i<directionObj.names().length();i++){
+                        lessons.add(directionObj.names().get(i).toString());
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        loadList(lessons);
+                    }
+                });
+            }
+        });
+
     }
 
     public void loadList(ArrayList<String> lessons){
@@ -144,6 +220,29 @@ public class ProgramFragment extends Fragment {
             e.printStackTrace();
         }
 
+        SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        boolean notify = sp.getBoolean("notifications", false);
+        int timeNotification = sp.getInt("notificationTime", 0);
+        int min,hour;
+        //the notifications should initialize ONLY if its the day of the week
+        //the user might switch to another day but should not get notification
+        if(selectedDay.equals(dayOfWeek) && notify){
+            for(int i=0;i<data.size();i++){
+                String timeString = data.get(i).getTime();
+                String s[] = timeString.split(":");
+                if(timeNotification == 30){
+                    min = Integer.valueOf(s[1])+30;
+                    hour = Integer.valueOf(s[0])-1;
+                }else{
+                    hour = Integer.valueOf(s[0]) - timeNotification;
+                    min = Integer.valueOf(s[1]);
+                }
+                NotificationScheduler notificationScheduler = new NotificationScheduler();
+                //random but UNIQUE id
+                notificationScheduler.setReminder(getActivity(), AlarmReceiver.class, hour, min, i);
+            }
+        }
+
         ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
         programList.setAdapter(adapter);
     }
@@ -165,57 +264,32 @@ public class ProgramFragment extends Fragment {
 
     }
 
-    class BackgroundWorkerProgram extends AsyncTask<String, String, String> {
-
-        Context context;
-        BackgroundWorkerProgram(Context ctx) {
-            context = ctx;
+    private String getDayOfWeek(int value) {
+        String day = "";
+        switch (value) {
+            case 1:
+                day = "ΚΥΡΙΑΚΗ";
+                break;
+            case 2:
+                day = "ΔΕΥΤΕΡΑ";
+                break;
+            case 3:
+                day = "ΤΡΙΤΗ";
+                break;
+            case 4:
+                day = "ΤΕΤΑΡΤΗ";
+                break;
+            case 5:
+                day = "ΠΕΜΠΤΗ";
+                break;
+            case 6:
+                day = "ΠΑΡΑΣΚΕΥΗ";
+                break;
+            case 7:
+                day = "ΣΑΒΒΑΤΟ";
+                break;
         }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String id = strings[0];
-            String semester = strings[1];
-            String direction = strings[2];
-            String method = "POST";
-            String url = "http://192.168.2.4/myprograms/getLessons.php";
-            String data = null;
-            try {
-                data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"
-                        + URLEncoder.encode("direction", "UTF-8") + "=" + URLEncoder.encode(direction, "UTF-8") + "&"
-                        + URLEncoder.encode("semester", "UTF-8") + "=" + URLEncoder.encode(semester, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            Connector connector = new Connector();
-            String result = connector.connect(method, url, data);
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            JSONObject jsonObject = null;
-            ArrayList<String> data = new ArrayList<>();
-            try {
-                JSONObject obj = new JSONObject(result);
-                JSONArray jsonArray = obj.getJSONArray("lessons");
-
-                for(int i=0; i < jsonArray.length(); i++) {
-                    jsonObject = jsonArray.getJSONObject(i);
-                    data.add(jsonObject.getString("id"));
-                }
-
-                loadList(data);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-        }
+        return day;
     }
 
 }
