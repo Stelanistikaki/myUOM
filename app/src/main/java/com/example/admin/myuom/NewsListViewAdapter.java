@@ -1,12 +1,14 @@
 package com.example.admin.myuom;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.CalendarContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
 public class NewsListViewAdapter extends ArrayAdapter<Post> {
@@ -29,9 +31,23 @@ public class NewsListViewAdapter extends ArrayAdapter<Post> {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mResource, parent, false);
 
+        Button addEvent = convertView.findViewById(R.id.add_event);
         TextView newsTitleText = (TextView) convertView.findViewById(R.id.newsTitleText);
 
-        newsTitleText.setText(post.getTitle());
+        if(!post.getTitle().equals(""))
+            newsTitleText.setText(post.getTitle());
+
+        addEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent calIntent = new Intent(Intent.ACTION_INSERT);
+                calIntent.setType("vnd.android.cursor.item/event");
+                calIntent.putExtra(CalendarContract.Events.TITLE, newsTitleText.getText());
+                calIntent.putExtra(CalendarContract.Events.EVENT_LOCATION, "Πανεπιστήμιο Μακεδονίας");
+                calIntent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+                getContext().startActivity(calIntent);
+            }
+        });
 
         return convertView;
     }

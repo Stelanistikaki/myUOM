@@ -1,40 +1,37 @@
 package com.example.admin.myuom;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 public class NewsFragment extends Fragment {
 
     private ListView newsList;
+    private String link="";
+    private SwipeRefreshLayout pullToRefresh;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,76 +39,79 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
         newsList = view.findViewById(R.id.news_list);
+        pullToRefresh = view.findViewById(R.id.pullToRefresh);
 
+        run();
 
-        BackgroundWorkerNews backgroundWorkerNews = new BackgroundWorkerNews(getContext());
-        backgroundWorkerNews.execute();
+        newsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Post aPost =(Post) parent.getItemAtPosition(position);
+                link = aPost.getLink();
+                Fragment fragment = new DetailNewsFragment(link);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.content_frame, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                run();
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
         return view;
     }
 
-    class BackgroundWorkerNews extends AsyncTask<String, String, String> {
+    public void run(){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://api.rss2json.com/v1/api.json?rss_url=http%3A%2F%2Fcreatefeed.fivefilters.org%2Fextract.php%3Furl%3Dhttps%253A%252F%252Fwww.uom.gr%252Fnea%26in_id_or_class%3Dpost-news-body%26url_contains%3D")
+                .build();
 
-        Context context;
-        BackgroundWorkerNews(Context ctx) {
-            context = ctx;
-        }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
 
-        @Override
-        protected String doInBackground(String... strings) {
-            String method = "GET";
-            String url = "https://api.rss2json.com/v1/api.json?rss_url=http%3A%2F%2Fcreatefeed.fivefilters.org%2Fextract.php%3Furl%3Dhttps%253A%252F%252Fwww.uom.gr%252Fnea%26in_id_or_class%3Dpost-news-body%26url_contains%3D";
-            String result="";
+            }
 
-            try {
-                URL Url = new URL(url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)Url.openConnection();
-                httpURLConnection.setRequestMethod(method);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-                result="";
-                String line="";
-                while((line = bufferedReader.readLine())!= null) {
-                    result += line;
+            @Override
+            public void onResponse(Response response) throws IOException {
+                ResponseBody responseBody = response.body();
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+                ArrayList<Post> data = null;
+
+                try {
+                    JSONObject obj = new JSONObject(responseBody.string());
+                    JSONArray jsonArray = obj.getJSONArray("items");
+                    Gson gson = new Gson();
+                    Type listType = new TypeToken<ArrayList<Post>>(){}.getType();
+                    data = gson.fromJson(jsonArray.toString(), listType);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                //the first item has no title so its out
+                for(int i=0; i<data.size();i++){
+                    if(data.get(i).getTitle().equals("")){
+                        data.remove(i);
+                    }
+                }
+
+                NewsListViewAdapter adapter = new NewsListViewAdapter(getContext(), R.layout.fragment_news_list, data);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        newsList.setAdapter(adapter);
+                    }
+                });
             }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-          //  JSONObject jsonObject = null;
-          //  ArrayList<String> data = new ArrayList<>();
-            ArrayList<Post> data = null;
-            try {
-                JSONObject obj = new JSONObject(result);
-                JSONArray jsonArray = obj.getJSONArray("items");
-                Gson gson = new Gson();
-                Type listType = new TypeToken<ArrayList<Post>>(){}.getType();
-                data = gson.fromJson(jsonArray.toString(), listType);
-//
-//                for(int i=0; i < jsonArray.length(); i++) {
-//                    jsonObject = jsonArray.getJSONObject(i);
-//                    data.add(jsonObject.getString("title"));
-//                }
-//
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            NewsListViewAdapter adapter = new NewsListViewAdapter(getContext(), R.layout.fragment_news_list, data);
-            newsList.setAdapter(adapter);
-
-
-        }
+        });
     }
 }
