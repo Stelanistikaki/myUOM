@@ -1,10 +1,9 @@
 package com.example.admin.myuom;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ public class CompusFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_compus, container, false);
 
         //Get a reference to your WebView//
-        WebView webView = (WebView) view.findViewById(R.id.compus);
+        WebView webView = (WebView) view.findViewById(R.id.webview);
 
         //Specify the URL you want to display//
         webView.loadUrl("https://compus.uom.gr/modules/auth/login.php");
