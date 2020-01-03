@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/card_background_program"
+    android:descendantFocusability="afterDescendants">
 
     <TextView
         android:id="@+id/timeText"
@@ -13,6 +15,8 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="20dp"
         android:clickable="false"
+        android:textColor="#000000"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,6 +29,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:clickable="false"
+        android:textColor="#000000"
         app:layout_constraintBaseline_toBaselineOf="@+id/timeText"
         app:layout_constraintEnd_toStartOf="@+id/classText"
         app:layout_constraintHorizontal_bias="0.411"
