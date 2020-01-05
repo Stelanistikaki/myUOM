@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class GradesFragment extends Fragment {
+public class GradesFragment extends Fragment{
 
     private ListView gradeList;
     private Spinner semesterSpinner;
@@ -157,7 +157,7 @@ public class GradesFragment extends Fragment {
                             e.printStackTrace();
                         }
 
-                        CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.custom_list_item, grades);
+                        CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.fragment_grades_list, grades);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override public void run() {
                                 gradeList.setAdapter(adapter);
