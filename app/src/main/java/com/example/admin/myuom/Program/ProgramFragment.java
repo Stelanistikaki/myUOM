@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.example.admin.myuom.Notification.AlarmReceiver;
 import com.example.admin.myuom.Notification.NotificationScheduler;
@@ -48,6 +49,8 @@ public class ProgramFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_program, container, false);
 
         programList = view.findViewById(R.id.program_list);
+        TextView emptyText = view.findViewById(R.id.emptyTextView);
+        programList.setEmptyView(emptyText);
         programSpinner = view.findViewById(R.id.programSpinner);
 
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>

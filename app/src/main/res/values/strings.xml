@@ -37,5 +37,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_program">Πρόγραμμα</string>
     <string name="add_event">Υπενθύμιση</string>
+    <string name="empty_text">Δεν έχεις μάθημα σήμερα!</string>
+    <string name="empty_text_grades">Δεν έχεις εγγραφεί σε μαθήματα</string>
 
 </resources>

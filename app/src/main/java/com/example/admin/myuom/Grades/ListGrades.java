@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.admin.myuom.Program.Lesson;
 import com.example.admin.myuom.R;
@@ -40,8 +41,9 @@ public class ListGrades extends Fragment {
 
         View view = inflater.inflate(R.layout.list_grades, container, false);
         gradeList = view.findViewById(R.id.grades_list);
-
+        TextView emptyTextGrades = view.findViewById(R.id.emptyTextViewGrades);
         run();
+        gradeList.setEmptyView(emptyTextGrades);
 
         return view;
     }
