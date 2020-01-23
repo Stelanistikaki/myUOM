@@ -39,5 +39,7 @@
     <string name="add_event">Υπενθύμιση</string>
     <string name="empty_text">Δεν έχεις μάθημα σήμερα!</string>
     <string name="empty_text_grades">Δεν έχεις εγγραφεί σε μαθήματα</string>
+    <string name="app_name_greek">Πανεπιστήμιο Μακεδονίας</string>
+    <string name="no_internet_string">"Δεν υπάρχει σύνδεση στο Internet!</string>
 
 </resources>

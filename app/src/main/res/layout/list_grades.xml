@@ -8,8 +8,10 @@
 
     <ListView
         android:id="@+id/grades_list"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:divider="#E6E6E6"
+        android:dividerHeight="0px"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
