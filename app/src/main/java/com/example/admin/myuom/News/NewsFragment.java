@@ -1,5 +1,8 @@
 package com.example.admin.myuom.News;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -66,6 +69,10 @@ public class NewsFragment extends Fragment {
             }
         });
 
+        if(!isOnline()){
+            view = inflater.inflate(R.layout.no_internet, container, false);
+
+        }
         return view;
     }
 
@@ -114,5 +121,11 @@ public class NewsFragment extends Fragment {
                 });
             }
         });
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

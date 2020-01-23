@@ -2,6 +2,8 @@ package com.example.admin.myuom.Grades;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -38,7 +40,12 @@ public class GradesFragment extends Fragment{
         semester = sp.getInt("semester",0);
         setupViewPager(viewPager);
 
+        if(!isOnline()){
+            view = inflater.inflate(R.layout.no_internet, container, false);
+
+        }
         return view;
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -56,6 +63,11 @@ public class GradesFragment extends Fragment{
         viewPager.setCurrentItem(semester-1);
     }
 
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 
 
 

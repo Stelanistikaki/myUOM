@@ -1,6 +1,9 @@
 package com.example.admin.myuom.Compus;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -30,6 +33,10 @@ public class CompusFragment extends Fragment {
         MyWebViewClient webViewClient = new MyWebViewClient();
         webView.setWebViewClient(webViewClient);
 
+        if(!isOnline()){
+            view = inflater.inflate(R.layout.no_internet, container, false);
+
+        }
         return view;
     }
 
@@ -49,6 +56,12 @@ public class CompusFragment extends Fragment {
             view.getContext().startActivity(intent);
             return true;
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 }

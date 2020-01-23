@@ -127,6 +127,10 @@ public class ListGrades extends Fragment {
                             e.printStackTrace();
                         }
 
+                        for(int i=0;i<grades.size();i++){
+                            Log.d("STELA", grades.get(i).getName());
+                        }
+
                         CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.grades_list_item, grades);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override public void run() {
