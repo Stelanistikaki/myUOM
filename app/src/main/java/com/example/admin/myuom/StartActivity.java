@@ -21,6 +21,8 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
         getSupportActionBar().hide();
 
+        //splash screen set up
+
         logoView = findViewById(R.id.logoStartPage);
 
         new Handler().postDelayed(new Runnable() {

@@ -11,6 +11,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragmentList = new ArrayList<>();
     private final List<String> mFragmentTitleList = new ArrayList<>();
 
+    //set up the page adapter for the tabs
+
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }

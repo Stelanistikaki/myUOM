@@ -17,6 +17,7 @@ public class CustomAdapterList extends ArrayAdapter<Grade> {
     Context mContext;
     int mResource;
 
+    //constructor
     public CustomAdapterList(Context context, int resource, ArrayList<Grade> data) {
         super(context, R.layout.fragment_grades, data);
         this.dataSet = data;
@@ -27,6 +28,7 @@ public class CustomAdapterList extends ArrayAdapter<Grade> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        //set up the listview
         Grade grade = dataSet.get(position);
 
         LayoutInflater inflater = LayoutInflater.from(mContext);

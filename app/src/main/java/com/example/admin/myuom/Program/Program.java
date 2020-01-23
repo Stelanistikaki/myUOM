@@ -1,8 +1,9 @@
 package com.example.admin.myuom.Program;
 
-import android.util.Log;
-
 class Program {
+
+    //class to set the Program values
+
     private String title, time, classroom;
 
     public void setTime(String time) {

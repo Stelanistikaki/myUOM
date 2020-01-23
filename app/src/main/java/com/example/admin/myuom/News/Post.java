@@ -4,6 +4,8 @@ public class Post {
     private String title;
     private String link;
 
+    //class for the Post values
+
     public String getTitle() {
         return title;
     }

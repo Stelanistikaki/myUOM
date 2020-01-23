@@ -52,17 +52,19 @@ public class SettingsFragment extends Fragment {
         timeSpinner = view.findViewById(R.id.timeSpinner);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
 
-
+        //set the time notification spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
                 (getContext(), android.R.layout.simple_spinner_item, timeNotificationString);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeSpinner.setAdapter(spinnerArrayAdapter);
 
-        // this = your fragment
+        // this = fragment
         sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         String id = sp.getString("id", "");
+        //the id is known
         aem.setText(id);
 
+        //notification switch for notifications on or off
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
@@ -76,9 +78,11 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        //set the shared preferences for notification time
         Boolean notificationsBool = sp.getBoolean("notifications", false);
         int timeNotification = sp.getInt("notificationTime", 0);
         //set the time according to what the user chose
+        //get only the number and not the text ("minutes")
         if(timeNotification == 30){
             timeSpinner.setSelection(0);
         }else if(timeNotification == 1){
@@ -86,13 +90,14 @@ public class SettingsFragment extends Fragment {
         }else{
             timeSpinner.setSelection(2);
         }
-
+        //set the ui to respond to the user clicks
         if(notificationsBool){
             notificationSwitch.setChecked(true);
         }else {
             notificationSwitch.setChecked(false);
         }
 
+        //the time spinner to choose the notification time
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long iD) {
@@ -106,6 +111,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        //get the data for the student from the database
         try {
             run(id);
         } catch (Exception e) {
@@ -137,12 +143,13 @@ public class SettingsFragment extends Fragment {
 
                 ResponseBody responseBody = response.body();
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                  Student student = gson.fromJson(responseBody.string(), Student.class);
+                //create the Student object to show the data
+                Student student = gson.fromJson(responseBody.string(), Student.class);
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        //set the views
                         lastName.setText(student.getLastName());
                         firstName.setText(student.getFirstName());
                         String s = student.getDepartment();

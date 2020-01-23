@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 public class DetailNewsFragment extends Fragment {
     private String link;
 
+    //detailed view with webview for news
     public DetailNewsFragment(String link){
         this.link = link;
     }

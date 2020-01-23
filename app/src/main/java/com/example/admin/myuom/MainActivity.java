@@ -1,11 +1,15 @@
 package com.example.admin.myuom;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
@@ -28,13 +32,18 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private TextView toolbarΤitle;
     private CharSequence mTitle;
+    private TextView navbarTitle ;
     SharedPreferences sp;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -45,8 +54,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
         }
-
         sp = getSharedPreferences("pref",MODE_PRIVATE);
+
+        //code for the blue color on the status bar
+        //not working with older os
 
 //        Window window = this.getWindow();
 //
@@ -59,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        // finally change the color
 //        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
 
+        //set the navigation drawer
         toolbarΤitle = (TextView) findViewById(R.id.titleToolbar);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         toolbarΤitle.setText("Πρόγραμμα");
@@ -82,9 +93,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setDrawerLayout(drawer)
                 .build();
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
-
+    //on back button pressed closes the drawer
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 || super.onSupportNavigateUp();
     }
 
+    //when an item in drawer is selected a new fragment loads
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         //creating fragment object
@@ -124,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragment = new ProgramFragment();
                 break;
             case R.id.nav_logout:
+                //if the user logges out the shared value has to change
                 sp.edit().putBoolean("logged",false).apply();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -133,12 +147,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         //replacing the fragment
-        if (fragment != null) {
+        if (fragment != null ) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
         }
 
+        //set the toolbar title according to selected item
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         toolbarΤitle.setText(menuItem.getTitle());

@@ -4,6 +4,8 @@ class Student {
     private String last_name, first_name, department, direction;
     private int semester;
 
+    //class for the student values
+
     public void setLastname(String last_name) {
         this.last_name = last_name;
     }

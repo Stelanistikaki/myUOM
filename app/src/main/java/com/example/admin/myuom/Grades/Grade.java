@@ -2,6 +2,8 @@ package com.example.admin.myuom.Grades;
 
 public class Grade {
 
+    //class for grade's properties
+
     private String name, grade;
 
     public String getName() {

@@ -71,6 +71,7 @@ public class NotificationScheduler
 
     public static void showNotification(Context context, Class<?> cls, String title, String content)
     {
+        //set the notification channel
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Intent notificationIntent = new Intent(context, cls);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -81,9 +82,11 @@ public class NotificationScheduler
 
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        //set the moovit intent
         Intent moovitIntent = new Intent(context, MoovitApp.class);
         PendingIntent moovitPendingIntent = PendingIntent.getActivity(context, REQUEST_CODE, moovitIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        //build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId);
         NotificationCompat.Builder notification = builder.setContentTitle(title)
                 .setChannelId(channelId)

@@ -38,9 +38,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
 
+        //shared boolean reference
         sp = getSharedPreferences("pref",MODE_PRIVATE);
 
         //false is the default value for booleans
+        //if the user is logged then go to Main Activity
         if(sp.getBoolean("logged",false)) {
             goToMainActivity();
             finish();
@@ -71,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    //get the data from database with api call
     public void run(String username, String password) throws Exception {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -96,18 +99,20 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     String text;
+                    //password from textview equals to password from database
                     if(password.equals(thePassword)){
                         text = "Επιτυχής σύνδεση! ";
+                        //set the shared preference values for the other activities
                         sp.edit().putBoolean("logged",true).apply();
                         sp.edit().putString("id", username).apply();
                         goToMainActivity();
                         finish();
                     }else {
+                        //something is wrong
                         text = "Tα στοιχεία σου είναι λάθος ";
                         intent = new Intent(LoginActivity.this, LoginActivity.class);
                         startActivity(intent);
                     }
-
                     runOnUiThread(new Runnable() {
                         public void run() {
                             Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();

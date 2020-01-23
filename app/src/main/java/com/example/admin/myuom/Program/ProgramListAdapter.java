@@ -36,7 +36,7 @@ public class ProgramListAdapter extends ArrayAdapter<Program> {
         TextView lessonTitleText = (TextView) convertView.findViewById(R.id.lessonText);
         TextView classText = convertView.findViewById(R.id.classText);
 
-        //set the textviews and the text for button
+        //set the textviews
         timeText.setText(theProgram.getTime());
         lessonTitleText.setText(theProgram.getTitle());
         classText.setText(theProgram.getClassroom());

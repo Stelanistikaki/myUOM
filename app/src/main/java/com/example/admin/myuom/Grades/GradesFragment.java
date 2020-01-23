@@ -7,8 +7,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,13 +31,15 @@ public class GradesFragment extends Fragment{
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        // this = your fragment
+        // this = fragment
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        //get the shared values
         id = sp.getString("id", "");
         direction = sp.getString("direction", "");
         semester = sp.getInt("semester",0);
         setupViewPager(viewPager);
 
+        //check if there is internet connection
         if(!isOnline()){
             view = inflater.inflate(R.layout.no_internet, container, false);
 
@@ -49,6 +49,7 @@ public class GradesFragment extends Fragment{
     }
 
     private void setupViewPager(ViewPager viewPager) {
+        //create the tabs for the semesters
         ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
         adapter.addFragment(new ListGrades(id, 1, direction), "1");
         adapter.addFragment(new ListGrades(id, 2, direction), "2");

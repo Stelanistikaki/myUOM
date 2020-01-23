@@ -47,9 +47,11 @@ public class NewsFragment extends Fragment {
 
         run();
 
+        //if the user clicks in an item of the list a new fragment with detailed view is created
         newsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //send the link of the item to detailed view
                 Post aPost =(Post) parent.getItemAtPosition(position);
                 link = aPost.getLink();
                 Fragment fragment = new DetailNewsFragment(link);
@@ -68,7 +70,7 @@ public class NewsFragment extends Fragment {
                 pullToRefresh.setRefreshing(false);
             }
         });
-
+        //check for internet connection
         if(!isOnline()){
             view = inflater.inflate(R.layout.no_internet, container, false);
 
@@ -79,6 +81,7 @@ public class NewsFragment extends Fragment {
     public void run(){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
+                //rss feed that gives the last 5 (4 visible) news of the news page in uom.gr
                 .url("https://api.rss2json.com/v1/api.json?rss_url=http%3A%2F%2Fcreatefeed.fivefilters.org%2Fextract.php%3Furl%3Dhttps%253A%252F%252Fwww.uom.gr%252Fnea%26in_id_or_class%3Dpost-news-body%26url_contains%3D")
                 .build();
 
@@ -96,6 +99,7 @@ public class NewsFragment extends Fragment {
                 ArrayList<Post> data = null;
 
                 try {
+                    //fill the data list with Post objects
                     JSONObject obj = new JSONObject(responseBody.string());
                     JSONArray jsonArray = obj.getJSONArray("items");
                     Gson gson = new Gson();
@@ -107,6 +111,7 @@ public class NewsFragment extends Fragment {
                 }
 
                 //the first item has no title so its out
+                //rss bug
                 for(int i=0; i<data.size();i++){
                     if(data.get(i).getTitle().equals("")){
                         data.remove(i);

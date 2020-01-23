@@ -16,14 +16,15 @@ public class MoovitApp extends AppCompatActivity {
             // Assume that Moovit app exists. If not, exception will occur
             PackageManager pm = getPackageManager();
             pm.getPackageInfo("com.tranzmate", PackageManager.GET_ACTIVITIES);
-            String uri = "moovit://directions?dest_lat=40.63314&dest_lon=22.94937&dest_name=Εγνατία165&orig_lat=&orig_lon=&orig_name=&date=&partner_id=<YOUR_APP_NAME>";
+            //set the location of uom
+            String uri = "moovit://directions?dest_lat=40.63314&dest_lon=22.94937&dest_name=Εγνατία165&orig_lat=&orig_lon=&orig_name=&date=&partner_id=myuom";
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(uri));
             startActivity(intent);
 
         } catch (PackageManager.NameNotFoundException e) {
             // Moovit not installed - send to store
-            String url = "https://app.appsflyer.com/id498477945?pid=DL&c=<YOUR_APP_NAME>";
+            String url = "https://play.google.com/store/apps/details?id=com.tranzmate";
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);

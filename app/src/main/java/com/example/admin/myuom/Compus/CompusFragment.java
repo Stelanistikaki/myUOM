@@ -33,6 +33,7 @@ public class CompusFragment extends Fragment {
         MyWebViewClient webViewClient = new MyWebViewClient();
         webView.setWebViewClient(webViewClient);
 
+        //check internet connection
         if(!isOnline()){
             view = inflater.inflate(R.layout.no_internet, container, false);
 

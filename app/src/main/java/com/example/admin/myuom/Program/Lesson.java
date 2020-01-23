@@ -2,6 +2,8 @@ package com.example.admin.myuom.Program;
 
 public class Lesson {
 
+    //class for Lesson values
+
     private String name, id_lesson;
 
     public String getName() {

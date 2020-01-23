@@ -6,8 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.example.admin.myuom.Notification.AlarmReceiver;
 import com.example.admin.myuom.Notification.NotificationScheduler;
 import com.example.admin.myuom.R;
@@ -89,13 +86,15 @@ public class ProgramFragment extends Fragment {
         }
         programSpinner.setSelection(selection);
 
-        // this = your fragment
+        // this = fragment
+        //get the shared values to show the correct data
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         id = sp.getString("id", "");
         semester = sp.getInt("semester",0);
         direction = sp.getString("direction", "");
 
-
+        //there are more than one lesson in some days at the same time
+        //thats why the "DAY2" and "DAY3" is used otherwise only the first lesson is gonna appear
         programSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long iD) {
@@ -130,6 +129,7 @@ public class ProgramFragment extends Fragment {
             }
         });
 
+        //if the list is empty show the empty view
         TextView emptyText = view.findViewById(R.id.emptyTextView);
         programList.setEmptyView(emptyText);
 
@@ -161,6 +161,8 @@ public class ProgramFragment extends Fragment {
 
                 JSONObject jsonObject = null;
 
+                //get the lessons for the selected semester and direction
+                //put them in list with Lesson objects
                 try {
                     JSONObject obj = new JSONObject(responseBody.string());
                     JSONObject semObj = obj.getJSONObject(String.valueOf(semester));
@@ -191,6 +193,7 @@ public class ProgramFragment extends Fragment {
         JSONObject obj = null;
         JSONObject jsonObject;
         try {
+            //get the data from the ep7.json file in assets file
             obj = new JSONObject(loadJSONFromAsset(getContext()));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -202,15 +205,19 @@ public class ProgramFragment extends Fragment {
 
             Program theProgram ;
             for(int i=0; i < jsonArray.length(); i++) {
+                //for the objects in the Lesson list
                 for(int j=0; j < lessons.size();j++){
                     jsonObject = jsonArray.getJSONObject(i);
+                    //compare the data in the Lesson list with the data in the json file
                     if(jsonObject.getString(selectedDay).contains(lessons.get(j))){
+                        //check if the selected day has no lessons
                         if(!selectedDay.equals("") && !(jsonObject.getString(selectedDay).equals(""))) {
                             theProgram = new Program();
                             theProgram.setTime(jsonObject.getString("ΩΡΑ"));
                             theProgram.setTitle(jsonObject.getString(selectedDay));
                             data.add(theProgram);
                         }
+                        //for each day (2 and 3)
                         else if(!selectedDay2.equals("") && !(jsonObject.getString(selectedDay2).equals(""))) {
                             Program theProgram2 = new Program();
                             theProgram2.setTime(jsonObject.getString("ΩΡΑ"));
@@ -236,6 +243,7 @@ public class ProgramFragment extends Fragment {
 
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         boolean notify = sp.getBoolean("notifications", false);
+        //if the notification switch is on set the notification
         int timeNotification = sp.getInt("notificationTime", 0);
         int min,hour;
         //the notifications should initialize ONLY if its the day of the week
@@ -256,7 +264,7 @@ public class ProgramFragment extends Fragment {
                 notificationScheduler.setReminder(getActivity(), AlarmReceiver.class, hour, min, i);
             }
         }
-
+        //set the list adapter
         ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
         programList.setAdapter(adapter);
     }
