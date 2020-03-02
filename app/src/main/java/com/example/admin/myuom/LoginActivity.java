@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.admin.myuom.Settings.SettingsFragment;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
@@ -105,6 +106,8 @@ public class LoginActivity extends AppCompatActivity {
                         //set the shared preference values for the other activities
                         sp.edit().putBoolean("logged",true).apply();
                         sp.edit().putString("id", username).apply();
+                        //this has to be here to update the sharedpreferences if another user logs in
+                        new SettingsFragment().run(sp.getString("id", ""), false, sp);
                         goToMainActivity();
                         finish();
                     }else {

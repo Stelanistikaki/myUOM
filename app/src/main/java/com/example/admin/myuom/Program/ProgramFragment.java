@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,8 +92,6 @@ public class ProgramFragment extends Fragment {
         //get the shared values to show the correct data
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         id = sp.getString("id", "");
-        semester = sp.getInt("semester",0);
-        direction = sp.getString("direction", "");
 
         //there are more than one lesson in some days at the same time
         //thats why the "DAY2" and "DAY3" is used otherwise only the first lesson is gonna appear
@@ -120,6 +120,9 @@ public class ProgramFragment extends Fragment {
                     selectedDay2 = "";
                     selectedDay3 = "";
                 }
+                //these has to be here to update the sharedpreferences correctly if the user changes
+                semester = sp.getInt("semester",0);
+                direction = sp.getString("direction", "");
                 run(id, String.valueOf(semester), direction);
 
             }

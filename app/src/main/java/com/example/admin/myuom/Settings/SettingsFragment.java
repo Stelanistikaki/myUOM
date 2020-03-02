@@ -6,7 +6,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.admin.myuom.MainActivity;
+import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.R;
 import com.google.gson.Gson;
 import com.squareup.okhttp.Callback;
@@ -34,7 +38,6 @@ public class SettingsFragment extends Fragment {
     Spinner timeSpinner;
     Switch notificationSwitch;
     View view;
-    SharedPreferences sp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +62,7 @@ public class SettingsFragment extends Fragment {
         timeSpinner.setAdapter(spinnerArrayAdapter);
 
         // this = fragment
-        sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         String id = sp.getString("id", "");
         //the id is known
         aem.setText(id);
@@ -113,7 +116,7 @@ public class SettingsFragment extends Fragment {
 
         //get the data for the student from the database
         try {
-            run(id);
+            run(id, true, sp);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,7 +128,7 @@ public class SettingsFragment extends Fragment {
         return view;
     }
 
-    public void run(String id){
+    public void run(String id, boolean isClicked, SharedPreferences sp){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/student/"+ id)
@@ -145,25 +148,29 @@ public class SettingsFragment extends Fragment {
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
                 //create the Student object to show the data
                 Student student = gson.fromJson(responseBody.string(), Student.class);
+                sp.edit().putInt("semester", student.getSemester()).apply();
+                sp.edit().putString("direction", student.getDirection()).apply();
+                if(isClicked)
+                    setView(student);
+            }
+        });
+    }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //set the views
-                        lastName.setText(student.getLastName());
-                        firstName.setText(student.getFirstName());
-                        String s = student.getDepartment();
-                        if (s.length() > 13) {
-                            String str[] = s.split(" ");
-                            department.setText(str[0] + "\n" + str[1]);
-                        } else
-                            department.setText(s);
-                        semester.setText(String.valueOf(student.getSemester()));
-                        sp.edit().putInt("semester", student.getSemester()).apply();
-                        sp.edit().putString("direction", student.getDirection()).apply();
-                        direction.setText(student.getDirection());
-                    }
-                });
+    public void setView(Student student){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //set the views
+                lastName.setText(student.getLastName());
+                firstName.setText(student.getFirstName());
+                String s = student.getDepartment();
+                if (s.length() > 13) {
+                    String str[] = s.split(" ");
+                    department.setText(str[0] + "\n" + str[1]);
+                } else
+                    department.setText(s);
+                semester.setText(String.valueOf(student.getSemester()));
+                direction.setText(student.getDirection());
             }
         });
     }
