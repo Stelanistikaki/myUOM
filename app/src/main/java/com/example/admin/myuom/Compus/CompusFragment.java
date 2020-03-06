@@ -26,6 +26,7 @@ public class CompusFragment extends Fragment {
 
         //Get a reference to your WebView//
         WebView webView = (WebView) view.findViewById(R.id.webview);
+        webView.getSettings().setBuiltInZoomControls(true);
 
         //Specify the URL you want to display//
         webView.loadUrl("https://compus.uom.gr/modules/auth/login.php");
@@ -33,11 +34,6 @@ public class CompusFragment extends Fragment {
         MyWebViewClient webViewClient = new MyWebViewClient();
         webView.setWebViewClient(webViewClient);
 
-        //check internet connection
-        if(!isOnline()){
-            view = inflater.inflate(R.layout.no_internet, container, false);
-
-        }
         return view;
     }
 
@@ -57,12 +53,6 @@ public class CompusFragment extends Fragment {
             view.getContext().startActivity(intent);
             return true;
         }
-    }
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 }

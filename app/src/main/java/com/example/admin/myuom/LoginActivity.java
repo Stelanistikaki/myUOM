@@ -3,6 +3,8 @@ package com.example.admin.myuom;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -57,14 +59,17 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = mUsernameView.getText().toString();
-                String password = mPasswordView.getText().toString();
+                if(isOnline()) {
+                    String username = mUsernameView.getText().toString();
+                    String password = mPasswordView.getText().toString();
 
-                try {
-                    run(username, password);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        run(username, password);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else
+                    Toast.makeText(LoginActivity.this, "Δεν υπάρχει σύνδεση στο Internet!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -110,11 +115,9 @@ public class LoginActivity extends AppCompatActivity {
                         new SettingsFragment().run(sp.getString("id", ""), false, sp);
                         goToMainActivity();
                         finish();
-                    }else {
-                        //something is wrong
+                    }else{
+                        //the credentials are wrong
                         text = "Tα στοιχεία σου είναι λάθος ";
-                        intent = new Intent(LoginActivity.this, LoginActivity.class);
-                        startActivity(intent);
                     }
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -125,6 +128,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }
 

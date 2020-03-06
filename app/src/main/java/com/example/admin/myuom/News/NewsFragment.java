@@ -35,7 +35,6 @@ public class NewsFragment extends Fragment {
 
     private ListView newsList;
     private String link="";
-    private SwipeRefreshLayout pullToRefresh;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,7 +42,6 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
         newsList = view.findViewById(R.id.news_list);
-        pullToRefresh = view.findViewById(R.id.pullToRefresh);
 
         run();
 
@@ -63,18 +61,6 @@ public class NewsFragment extends Fragment {
             }
         });
 
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                run();
-                pullToRefresh.setRefreshing(false);
-            }
-        });
-        //check for internet connection
-        if(!isOnline()){
-            view = inflater.inflate(R.layout.no_internet, container, false);
-
-        }
         return view;
     }
 
@@ -128,9 +114,4 @@ public class NewsFragment extends Fragment {
         });
     }
 
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
 }

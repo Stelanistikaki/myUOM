@@ -39,7 +39,6 @@ public class ListGrades extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.list_grades, container, false);
         gradeList = view.findViewById(R.id.grades_list);
         TextView emptyTextGrades = view.findViewById(R.id.emptyTextViewGrades);

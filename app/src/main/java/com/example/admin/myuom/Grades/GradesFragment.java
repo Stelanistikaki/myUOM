@@ -7,6 +7,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,6 @@ public class GradesFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         view = inflater.inflate(R.layout.fragment_grades, container, false);
 
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
@@ -39,18 +40,13 @@ public class GradesFragment extends Fragment{
         semester = sp.getInt("semester",0);
         setupViewPager(viewPager);
 
-        //check if there is internet connection
-        if(!isOnline()){
-            view = inflater.inflate(R.layout.no_internet, container, false);
-
-        }
         return view;
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
         //create the tabs for the semesters
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new ListGrades(id, 1, direction), "1");
         adapter.addFragment(new ListGrades(id, 2, direction), "2");
         adapter.addFragment(new ListGrades(id, 3, direction), "3");
@@ -63,13 +59,5 @@ public class GradesFragment extends Fragment{
         //-1 because it starts from 0
         viewPager.setCurrentItem(semester-1);
     }
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-
 
 }

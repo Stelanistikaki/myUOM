@@ -136,10 +136,6 @@ public class ProgramFragment extends Fragment {
         TextView emptyText = view.findViewById(R.id.emptyTextView);
         programList.setEmptyView(emptyText);
 
-        if(!isOnline()){
-            view = inflater.inflate(R.layout.no_internet, container, false);
-
-        }
         return view;
     }
 
@@ -315,12 +311,6 @@ public class ProgramFragment extends Fragment {
                 break;
         }
         return day;
-    }
-
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
 }

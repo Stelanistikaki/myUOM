@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,10 +29,12 @@ import com.example.admin.myuom.News.NewsFragment;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.Settings.SettingsFragment;
 import com.google.android.material.navigation.NavigationView;
+
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,7 +47,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AppBarConfiguration mAppBarConfiguration;
     private TextView toolbarΤitle;
     private CharSequence mTitle;
-    private TextView navbarTitle ;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private MenuItem menuItemforRefresh ;
     SharedPreferences sp;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -51,8 +56,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        swipeRefreshLayout = findViewById(R.id.pullToRefreshInternet);
+
+        //this checks if the app has been opened
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
+            //it has to check if there is internet connection here or else the program fragment will start
+            //without Internet connection
+            if(!isOnline()){
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new NoInternetFragment());
+                ft.commit();
+            }else
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
         }
         sp = getSharedPreferences("pref",MODE_PRIVATE);
 
@@ -94,6 +110,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
         navigationView.setNavigationItemSelectedListener(this);
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(!isOnline()) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new NoInternetFragment());
+                    ft.commit();
+                }else{
+                    if(menuItemforRefresh != null) {
+                        onNavigationItemSelected(menuItemforRefresh);
+                    }
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     //on back button pressed closes the drawer
@@ -117,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //when an item in drawer is selected a new fragment loads
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        menuItemforRefresh = menuItem;
         //creating fragment object
         Fragment fragment = null;
         //initializing the fragment object which is selected
@@ -147,9 +179,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         //replacing the fragment
-        if (fragment != null ) {
+        if (fragment != null && isOnline()) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }else{
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new NoInternetFragment());
             ft.commit();
         }
 
@@ -164,5 +200,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void setTitle(CharSequence title) {
         mTitle = title;
         toolbarΤitle.setText(mTitle);
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }
