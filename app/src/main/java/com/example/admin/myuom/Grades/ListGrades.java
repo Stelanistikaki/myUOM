@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.admin.myuom.Program.Lesson;
 import com.example.admin.myuom.R;
@@ -68,6 +69,13 @@ public class ListGrades extends Fragment {
             @Override
             public void onResponse(Response response) throws IOException {
                 ResponseBody responseBody = response.body();
+                if(response.code() == 429){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            Toast.makeText(getActivity(), "Περίμενε λιγο υπερφόρτωσα..Δοκίμασε σε 1 λεπτο", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
                 try {
@@ -134,13 +142,15 @@ public class ListGrades extends Fragment {
                             e.printStackTrace();
                         }
                         //set the adapter of the list
-                        CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.grades_list_item, grades);
-                        //not available in fragment so get the activity
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override public void run() {
-                                gradeList.setAdapter(adapter);
-                            }
-                        });
+                        if(!grades.isEmpty()){
+                            CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.grades_list_item, grades);
+                            //not available in fragment so get the activity
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override public void run() {
+                                    gradeList.setAdapter(adapter);
+                                }
+                            });
+                        }
                     }
                 });
 
