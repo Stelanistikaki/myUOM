@@ -104,24 +104,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_uomNews, R.id.nav_compus, R.id.nav_grades,
+                R.id.nav_uomNews, R.id.nav_compus, R.id.nav_grades, R.id.nav_email,
                 R.id.nav_settings, R.id.nav_logout)
                 .setDrawerLayout(drawer)
                 .build();
         navigationView.setNavigationItemSelectedListener(this);
 
+        //when the user refreshes the screen with swipe down it checks for internet connection
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                //if there is not internet connection the no internet fragment is used
                 if(!isOnline()) {
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.content_frame, new NoInternetFragment());
                     ft.commit();
+                //if there is internet it has to reload the same menu item that it was selected (if it was one clicked)
                 }else{
                     if(menuItemforRefresh != null) {
                         onNavigationItemSelected(menuItemforRefresh);
                     }
                 }
+                //stop refreshing
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -148,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //when an item in drawer is selected a new fragment loads
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        menuItemforRefresh = menuItem;
+        Intent intent;
         //creating fragment object
         Fragment fragment = null;
         //initializing the fragment object which is selected
@@ -168,31 +172,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_program:
                 fragment = new ProgramFragment();
                 break;
+            case R.id.nav_email:
+                //the default email client will open with the intent
+                intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                startActivity(intent);
+                break;
             case R.id.nav_logout:
                 //if the user logges out the shared value has to change
                 sp.edit().putBoolean("logged",false).apply();
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
                 break;
-
         }
+        //the email does not have a UI in the app so the previous selected item will remain
+        if(menuItem.getItemId() != R.id.nav_email)
+            menuItemforRefresh = menuItem;
 
         //replacing the fragment
         if (fragment != null && isOnline()) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
+            toolbarΤitle.setText(menuItem.getTitle());
+        //this is for the email selection | it will keep showing the program
+        }else if(fragment == null){
+            //this is for the case that the user has not selected another menu item only the email (first)
+            if(menuItemforRefresh != null){
+                onNavigationItemSelected(menuItemforRefresh);
+                toolbarΤitle.setText((String) menuItemforRefresh.getTitle());
+            }else {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new ProgramFragment());
+                ft.commit();
+            }
         }else{
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, new NoInternetFragment());
             ft.commit();
+            toolbarΤitle.setText(menuItem.getTitle());
         }
 
         //set the toolbar title according to selected item
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        toolbarΤitle.setText(menuItem.getTitle());
+
         return true;
     }
 
