@@ -190,6 +190,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(menuItem.getItemId() != R.id.nav_email)
             menuItemforRefresh = menuItem;
 
+        //if the user chooses anything but the compus (which is webview with zoom option)
+        //he can use the swipe to refresh layout
+        swipeRefreshLayout.setEnabled(true);
+        if(menuItem.getItemId() == R.id.nav_compus)
+            swipeRefreshLayout.setEnabled(false);
+
         //replacing the fragment
         if (fragment != null && isOnline()) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
