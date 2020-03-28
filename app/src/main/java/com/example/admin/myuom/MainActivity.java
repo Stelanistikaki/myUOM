@@ -121,8 +121,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ft.commit();
                 //if there is internet it has to reload the same menu item that it was selected (if it was one clicked)
                 }else{
+                    //if the user had selected an item before
                     if(menuItemforRefresh != null) {
+                        Log.d("STELA", "HEY");
                         onNavigationItemSelected(menuItemforRefresh);
+                    //if there is not an item selected
+                    }else{
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
                     }
                 }
                 //stop refreshing
