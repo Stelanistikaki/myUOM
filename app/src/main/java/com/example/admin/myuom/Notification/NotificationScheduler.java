@@ -82,6 +82,10 @@ public class NotificationScheduler
 
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        //set the google maps intent
+        Intent gmapsIntent = new Intent(context, GoogleMapsApp.class);
+        PendingIntent gmapsPendingIntent = PendingIntent.getActivity(context, REQUEST_CODE, gmapsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         //set the moovit intent
         Intent moovitIntent = new Intent(context, MoovitApp.class);
         PendingIntent moovitPendingIntent = PendingIntent.getActivity(context, REQUEST_CODE, moovitIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -93,7 +97,10 @@ public class NotificationScheduler
                 .setSound(alarmSound)
                 .setSmallIcon(R.drawable.uomlogo)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(R.drawable.ic_menu_send, "Πάμε με Google Maps", gmapsPendingIntent)
                 .addAction(R.drawable.ic_menu_send, "Πάμε με Moovit", moovitPendingIntent);
+
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 

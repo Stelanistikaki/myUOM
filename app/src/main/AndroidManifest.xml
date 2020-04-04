@@ -33,7 +33,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Notification.MoovitApp" />
+        <!-- noHistory : not display the main activity when the back button is clicked after the actions -->
+        <activity android:name=".Notification.MoovitApp"  android:noHistory="true"/>
+        <activity android:name=".Notification.GoogleMapsApp" android:noHistory="true"/>
         <!-- Register the Alarm Receiver -->
         <receiver android:name=".Notification.AlarmReceiver"
             android:enabled="false">

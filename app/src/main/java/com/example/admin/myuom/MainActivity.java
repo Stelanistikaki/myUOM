@@ -9,14 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -36,11 +33,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -122,13 +118,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //if there is internet it has to reload the same menu item that it was selected (if it was one clicked)
                 }else{
                     //if the user had selected an item before
-                    if(menuItemforRefresh != null) {
-                        Log.d("STELA", "HEY");
+                    if(menuItemforRefresh != null)
                         onNavigationItemSelected(menuItemforRefresh);
                     //if there is not an item selected
-                    }else{
+                    else
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
-                    }
                 }
                 //stop refreshing
                 swipeRefreshLayout.setRefreshing(false);
