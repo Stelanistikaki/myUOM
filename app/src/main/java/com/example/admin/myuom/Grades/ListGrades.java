@@ -79,29 +79,17 @@ public class ListGrades extends Fragment {
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
                 try {
-                    JSONObject obj = new JSONObject(responseBody.string());
-                    //get from the response the semester that the user wants
-                    JSONObject semObj = obj.getJSONObject(String.valueOf(semester));
-                    //then get the object of the drection (ΕΠ or ΔΤ)
-                    JSONObject lessonObj = semObj.getJSONObject(direction);
+                    JSONObject lessonObj = new JSONObject(responseBody.string());
                     //for the lessons that are available get the values and make Lessons objects
                     for(int i=0; i<lessonObj.names().length();i++){
-                        Lesson aLesson = new Lesson();
                         String id = lessonObj.names().get(i).toString();
-                        aLesson.setId(id);
                         JSONObject lesson = lessonObj.getJSONObject(id);
-                        aLesson.setName(lesson.getString("name"));
-                        lessons.add(aLesson);
-                    }
-                    //also get the lessons that are mutual for both of the directions
-                    lessonObj = semObj.getJSONObject("ΕΠΔΤ");
-                    for(int i=0; i<lessonObj.names().length();i++){
-                        Lesson aLesson = new Lesson();
-                        String id = lessonObj.names().get(i).toString();
-                        aLesson.setId(id);
-                        JSONObject lesson = lessonObj.getJSONObject(id);
-                        aLesson.setName(lesson.getString("name"));
-                        lessons.add(aLesson);
+                        if(lesson.getInt("semester") == semester) {
+                            Lesson aLesson = new Lesson();
+                            aLesson.setId(id);
+                            aLesson.setName(lesson.getString("name"));
+                            lessons.add(aLesson);
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -131,8 +119,7 @@ public class ListGrades extends Fragment {
                                     if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
                                         Grade grade = new Grade();
                                         String id_lesson = obj.names().get(i).toString();
-                                        JSONObject gradeobj = obj.getJSONObject(id_lesson);
-                                        grade.setGrade(gradeobj.getString("grade"));
+                                        grade.setGrade(obj.getString(id_lesson));
                                         grade.setName(lessons.get(j).getName());
                                         grades.add(grade);
                                     }

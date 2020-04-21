@@ -12,7 +12,7 @@ class Program {
     }
 
     public void setTitle(String title) {
-        String theTitle[] = title.split("-");
+        String theTitle[] = title.split("/");
         setClassroom(theTitle[3]);
         this.title = theTitle[0];
     }

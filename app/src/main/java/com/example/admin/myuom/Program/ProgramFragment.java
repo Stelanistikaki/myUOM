@@ -2,8 +2,6 @@ package com.example.admin.myuom.Program;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
@@ -123,7 +121,7 @@ public class ProgramFragment extends Fragment {
                 //these has to be here to update the sharedpreferences correctly if the user changes
                 semester = sp.getInt("semester",0);
                 direction = sp.getString("direction", "");
-                run(id, String.valueOf(semester), direction);
+                run(id, semester, direction);
 
             }
             @Override
@@ -139,7 +137,7 @@ public class ProgramFragment extends Fragment {
         return view;
     }
 
-    public void run(String username, String semester, String direction){
+    public void run(String username, int semester, String direction){
         OkHttpClient client = new OkHttpClient();
 
         Request requestLessons = new Request.Builder()
@@ -163,18 +161,14 @@ public class ProgramFragment extends Fragment {
                 //get the lessons for the selected semester and direction
                 //put them in list with Lesson objects
                 try {
-                    JSONObject obj = new JSONObject(responseBody.string());
-                    JSONObject semObj = obj.getJSONObject(String.valueOf(semester));
-                    JSONObject directionObj = semObj.getJSONObject(direction);
-
-                    for(int i=0; i<directionObj.names().length();i++){
-                       lessons.add(directionObj.names().get(i).toString());
+                    JSONObject lessonObj = new JSONObject(responseBody.string());
+                    //for the lessons that are available get the values and make Lessons objects
+                    for(int i=0; i<lessonObj.names().length();i++){
+                        String id = lessonObj.names().get(i).toString();
+                        JSONObject lesson = lessonObj.getJSONObject(id);
+                        if(lesson.getInt("semester") == semester)
+                            lessons.add(id);
                     }
-                    directionObj = semObj.getJSONObject("ΕΠΔΤ");
-                    for(int i=0; i<directionObj.names().length();i++){
-                        lessons.add(directionObj.names().get(i).toString());
-                    }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -263,6 +257,7 @@ public class ProgramFragment extends Fragment {
                 notificationScheduler.setReminder(getActivity(), AlarmReceiver.class, hour, min, i);
             }
         }
+
         //set the list adapter
         ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
         programList.setAdapter(adapter);

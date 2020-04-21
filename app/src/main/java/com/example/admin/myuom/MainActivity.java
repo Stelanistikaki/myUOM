@@ -130,14 +130,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    //on back button pressed closes the drawer
+    //on back button pressed closes the drawer or the app
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
@@ -183,10 +183,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
-                break;
         }
         //the email does not have a UI in the app so the previous selected item will remain
-        if(menuItem.getItemId() != R.id.nav_email)
+        if(menuItem.getItemId() != R.id.nav_email && menuItem.getItemId() != R.id.nav_logout)
             menuItemforRefresh = menuItem;
 
         //if the user chooses anything but the compus (which is webview with zoom option)

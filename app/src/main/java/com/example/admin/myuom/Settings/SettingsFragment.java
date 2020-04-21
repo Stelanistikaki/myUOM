@@ -127,7 +127,7 @@ public class SettingsFragment extends Fragment {
     public void run(String id, boolean isClicked, SharedPreferences sp){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/student/"+ id)
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/student_info/"+ id)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
