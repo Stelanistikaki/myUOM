@@ -12,15 +12,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.admin.myuom.Program.Lesson;
 import com.example.admin.myuom.R;
 import com.google.android.material.tabs.TabLayout;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 
 public class GradesFragment extends Fragment{
 
-    View view;
-    String id, direction;
-    int semester;
+    private View view;
+    private String id, direction;
+    private int semester;
+    private ArrayList<Lesson> lessons;
+
+
+    public GradesFragment(ArrayList<Lesson> lessons) {
+        this.lessons = lessons;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,14 +58,14 @@ public class GradesFragment extends Fragment{
     private void setupViewPager(ViewPager viewPager) {
         //create the tabs for the semesters
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new ListGrades(id, 1, direction), "1");
-        adapter.addFragment(new ListGrades(id, 2, direction), "2");
-        adapter.addFragment(new ListGrades(id, 3, direction), "3");
-        adapter.addFragment(new ListGrades(id, 4, direction), "4");
-        adapter.addFragment(new ListGrades(id, 5, direction), "5");
-        adapter.addFragment(new ListGrades(id, 6, direction), "6");
-        adapter.addFragment(new ListGrades(id, 7, direction), "7");
-        adapter.addFragment(new ListGrades(id, 8, direction), "8");
+        adapter.addFragment(new ListGrades(id, 1, lessons), "1");
+        adapter.addFragment(new ListGrades(id, 2, lessons), "2");
+        adapter.addFragment(new ListGrades(id, 3, lessons), "3");
+        adapter.addFragment(new ListGrades(id, 4, lessons), "4");
+        adapter.addFragment(new ListGrades(id, 5, lessons), "5");
+        adapter.addFragment(new ListGrades(id, 6, lessons), "6");
+        adapter.addFragment(new ListGrades(id, 7, lessons), "7");
+        adapter.addFragment(new ListGrades(id, 8, lessons), "8");
         viewPager.setAdapter(adapter);
         //-1 because it starts from 0
         viewPager.setCurrentItem(semester-1);

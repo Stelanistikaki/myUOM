@@ -14,6 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.example.admin.myuom.Grades.CustomAdapterList;
+import com.example.admin.myuom.Grades.Grade;
 import com.example.admin.myuom.Notification.AlarmReceiver;
 import com.example.admin.myuom.Notification.NotificationScheduler;
 import com.example.admin.myuom.R;
@@ -22,6 +25,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,12 +39,16 @@ public class ProgramFragment extends Fragment {
 
     private ListView programList;
     private Spinner programSpinner;
-    String id, direction;
+    String id;
     int semester;
     String dayOfWeek;
     String selectedDay,selectedDay2="",selectedDay3="";
-    ArrayList<String> lessons;
+    ArrayList<Lesson> lessons;
     private String[] programString = {"Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή"};
+
+    public ProgramFragment (ArrayList<Lesson> lessons){
+        this.lessons = lessons;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +98,7 @@ public class ProgramFragment extends Fragment {
         //get the shared values to show the correct data
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         id = sp.getString("id", "");
+        semester = sp.getInt("semester", 0);
 
         //there are more than one lesson in some days at the same time
         //thats why the "DAY2" and "DAY3" is used otherwise only the first lesson is gonna appear
@@ -118,11 +127,8 @@ public class ProgramFragment extends Fragment {
                     selectedDay2 = "";
                     selectedDay3 = "";
                 }
-                //these has to be here to update the sharedpreferences correctly if the user changes
-                semester = sp.getInt("semester",0);
-                direction = sp.getString("direction", "");
-                run(id, semester, direction);
 
+                run(semester,lessons);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -137,52 +143,7 @@ public class ProgramFragment extends Fragment {
         return view;
     }
 
-    public void run(String username, int semester, String direction){
-        OkHttpClient client = new OkHttpClient();
-
-        Request requestLessons = new Request.Builder()
-                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
-                .build();
-
-        client.newCall(requestLessons).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                lessons = new ArrayList<String>();
-                ResponseBody responseBody = response.body();
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                JSONObject jsonObject = null;
-
-                //get the lessons for the selected semester and direction
-                //put them in list with Lesson objects
-                try {
-                    JSONObject lessonObj = new JSONObject(responseBody.string());
-                    //for the lessons that are available get the values and make Lessons objects
-                    for(int i=0; i<lessonObj.names().length();i++){
-                        String id = lessonObj.names().get(i).toString();
-                        JSONObject lesson = lessonObj.getJSONObject(id);
-                        if(lesson.getInt("semester") == semester)
-                            lessons.add(id);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override public void run() {
-                        loadList(lessons);
-                    }
-                });
-            }
-        });
-
-    }
-
-    public void loadList(ArrayList<String> lessons){
+    public void loadList(ArrayList<Lesson> lessons, int semester, ArrayList<String> studentLessons){
         JSONObject obj = null;
         JSONObject jsonObject;
         try {
@@ -195,40 +156,34 @@ public class ProgramFragment extends Fragment {
         ArrayList<Program> data = new ArrayList<>();
         try {
             JSONArray jsonArray = obj.getJSONArray("ΠΡΟΓΡΑΜΜΑ");
-
             Program theProgram ;
-            for(int i=0; i < jsonArray.length(); i++) {
-                //for the objects in the Lesson list
-                for(int j=0; j < lessons.size();j++){
+            for(int j=0; j< studentLessons.size();j++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     jsonObject = jsonArray.getJSONObject(i);
                     //compare the data in the Lesson list with the data in the json file
-                    if(jsonObject.getString(selectedDay).contains(lessons.get(j))){
+                    if (jsonObject.getString(selectedDay).contains(studentLessons.get(j))) {
                         //check if the selected day has no lessons
-                        if(!selectedDay.equals("") && !(jsonObject.getString(selectedDay).equals(""))) {
+                        if (!selectedDay.equals("") && !(jsonObject.getString(selectedDay).equals(""))) {
                             theProgram = new Program();
                             theProgram.setTime(jsonObject.getString("ΩΡΑ"));
                             theProgram.setTitle(jsonObject.getString(selectedDay));
                             data.add(theProgram);
                         }
                         //for each day (2 and 3)
-                        else if(!selectedDay2.equals("") && !(jsonObject.getString(selectedDay2).equals(""))) {
+                        else if (!selectedDay2.equals("") && !(jsonObject.getString(selectedDay2).equals(""))) {
                             Program theProgram2 = new Program();
                             theProgram2.setTime(jsonObject.getString("ΩΡΑ"));
                             theProgram2.setTitle(jsonObject.getString(selectedDay2));
                             data.add(theProgram2);
-                        }
-                        else if(!selectedDay3.equals("") && !(jsonObject.getString(selectedDay3).equals(""))) {
+                        } else if (!selectedDay3.equals("") && !(jsonObject.getString(selectedDay3).equals(""))) {
                             Program theProgram3 = new Program();
                             theProgram3.setTime(jsonObject.getString("ΩΡΑ"));
                             theProgram3.setTitle(jsonObject.getString(selectedDay3));
                             data.add(theProgram3);
                         }
                     }
-
                 }
-
             }
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -260,7 +215,49 @@ public class ProgramFragment extends Fragment {
 
         //set the list adapter
         ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
-        programList.setAdapter(adapter);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override public void run() {
+                programList.setAdapter(adapter);
+            }
+        });
+    }
+
+    public void run(int semester, ArrayList<Lesson> lessons){
+        OkHttpClient client = new OkHttpClient();
+        //after the list of the lessons is filled get the grades for the lessons in the Lesson list
+        Request requestGrade = new Request.Builder().url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id).build();
+
+        client.newCall(requestGrade).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                ArrayList<String> studentLessons = new ArrayList<>();
+                ResponseBody responseBody = response.body();
+                JSONObject obj = null;
+                try {
+                    obj = new JSONObject(responseBody.string());
+                    for(int j=0; j<lessons.size();j++){
+                        if(lessons.get(j).getSemester() == semester){
+                            for(int i=0; i<obj.names().length();i++){
+                                //compare the id of lesson in the Lesson list and the response from the api call
+                                if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
+                                    String id_lesson = obj.names().get(i).toString();
+                                    studentLessons.add(id_lesson);
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                loadList(lessons, semester, studentLessons);
+            }
+        });
+
     }
 
     public String loadJSONFromAsset(Context context) {

@@ -1,0 +1,56 @@
+package com.example.admin.myuom;
+
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.example.admin.myuom.Program.Lesson;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.util.ArrayList;
+
+class LessonsTask extends AsyncTask<Void, Void, ArrayList<Lesson>> {
+    ArrayList<Lesson> lessons = new ArrayList<Lesson>();
+
+    @Override
+    protected ArrayList<Lesson> doInBackground(Void... voids) {
+        OkHttpClient client = new OkHttpClient();
+        Request requestLessons = new Request.Builder()
+                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
+                .build();
+
+        Response response = null;
+        try {
+            response = client.newCall(requestLessons).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ResponseBody responseBody = response.body();
+        if (!response.isSuccessful()) try {
+            throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            JSONObject lessonsObj = new JSONObject(responseBody.string());
+            //for the lessons that are available get the values and make Lessons objects
+            for (int i = 0; i < lessonsObj.names().length(); i++) {
+                String id = lessonsObj.names().get(i).toString();
+                JSONObject lesson = lessonsObj.getJSONObject(id);
+                Lesson theLesson = new Lesson();
+                theLesson.setId(id);
+                theLesson.setName(lesson.getString("name"));
+                theLesson.setSemester(lesson.getInt("semester"));
+                lessons.add(theLesson);
+            }
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+        return lessons;
+    }
+}

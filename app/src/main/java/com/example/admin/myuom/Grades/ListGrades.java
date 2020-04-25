@@ -21,20 +21,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import androidx.fragment.app.Fragment;
 
 public class ListGrades extends Fragment {
-    private String id, direction;
+    private String id;
     private int semester;
     private ListView gradeList;
+    private ArrayList<Lesson> lessons;
 
     //constructor
-    public ListGrades(String id, int semester, String direction){
+    public ListGrades(String id, int semester, ArrayList<Lesson> lessons){
         this.id = id;
-        this.direction = direction;
         this.semester = semester;
+        this.lessons = lessons;
     }
 
     @Override
@@ -52,15 +54,11 @@ public class ListGrades extends Fragment {
 
     public void run(){
         OkHttpClient client = new OkHttpClient();
-        ArrayList<Lesson> lessons = new ArrayList<>();
         ArrayList<Grade> grades = new ArrayList<>();
+        //after the list of the lessons is filled get the grades for the lessons in the Lesson list
+        Request requestGrade = new Request.Builder().url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id).build();
 
-        Request requestLessons = new Request.Builder()
-                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
-                .build();
-
-        //call the client
-        client.newCall(requestLessons).enqueue(new Callback() {
+        client.newCall(requestGrade).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
 
@@ -69,62 +67,24 @@ public class ListGrades extends Fragment {
             @Override
             public void onResponse(Response response) throws IOException {
                 ResponseBody responseBody = response.body();
-                if(response.code() == 429){
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override public void run() {
-                            Toast.makeText(getActivity(), "Περίμενε λιγο υπερφόρτωσα..Δοκίμασε σε 1 λεπτο", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-                try {
-                    JSONObject lessonObj = new JSONObject(responseBody.string());
-                    //for the lessons that are available get the values and make Lessons objects
-                    for(int i=0; i<lessonObj.names().length();i++){
-                        String id = lessonObj.names().get(i).toString();
-                        JSONObject lesson = lessonObj.getJSONObject(id);
-                        if(lesson.getInt("semester") == semester) {
-                            Lesson aLesson = new Lesson();
-                            aLesson.setId(id);
-                            aLesson.setName(lesson.getString("name"));
-                            lessons.add(aLesson);
-                        }
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                //after the list of the lessons is filled get the grades for the lessons in the Lesson list
-                Request requestGrade = new Request.Builder()
-                        .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id)
-                        .build();
-
-                client.newCall(requestGrade).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Request request, IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Response response) throws IOException {
-                        ResponseBody responseBody = response.body();
                         JSONObject obj = null;
                         try {
                             obj = new JSONObject(responseBody.string());
-
-                            for(int i=0; i<obj.names().length();i++){
-                                for(int j=0; j<lessons.size();j++){
-                                    //compare the id of lesson in the Lesson list and the response from the api call
-                                    if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
-                                        Grade grade = new Grade();
-                                        String id_lesson = obj.names().get(i).toString();
-                                        grade.setGrade(obj.getString(id_lesson));
-                                        grade.setName(lessons.get(j).getName());
-                                        grades.add(grade);
+                            for(int j=0; j<lessons.size();j++){
+                                if(lessons.get(j).getSemester() == semester){
+                                    for(int i=0; i<obj.names().length();i++){
+                                        //compare the id of lesson in the Lesson list and the response from the api call
+                                        if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
+                                            Grade grade = new Grade();
+                                            String id_lesson = obj.names().get(i).toString();
+                                            grade.setGrade(obj.getString(id_lesson));
+                                            grade.setName(lessons.get(j).getName());
+                                            grades.add(grade);
+                                        }
                                     }
                                 }
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -141,9 +101,5 @@ public class ListGrades extends Fragment {
                     }
                 });
 
-            }
-        });
-
     }
-
 }

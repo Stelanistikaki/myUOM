@@ -13,29 +13,26 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-
+import android.util.Log;
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.example.admin.myuom.Compus.CompusFragment;
 import com.example.admin.myuom.Grades.GradesFragment;
 import com.example.admin.myuom.News.NewsFragment;
+import com.example.admin.myuom.Program.Lesson;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.Settings.SettingsFragment;
 import com.google.android.material.navigation.NavigationView;
-
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout swipeRefreshLayout;
     private MenuItem menuItemforRefresh ;
     SharedPreferences sp;
+    ArrayList<Lesson> lessons;
+    LessonsTask task = new LessonsTask();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -54,6 +53,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         swipeRefreshLayout = findViewById(R.id.pullToRefreshInternet);
+
+        //this gets the lessons from the API
+        // and gives them to the program and grades fragments
+        try {
+            lessons = task.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         //this checks if the app has been opened
         if (savedInstanceState == null) {
@@ -64,21 +73,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.replace(R.id.content_frame, new NoInternetFragment());
                 ft.commit();
             }else
-                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
         }
-        sp = getSharedPreferences("pref",MODE_PRIVATE);
 
         //code for the blue color on the status bar
         //not working with older os
-
 //        Window window = this.getWindow();
-//
 //        // clear FLAG_TRANSLUCENT_STATUS flag:
 //        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//
 //        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
 //        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//
 //        // finally change the color
 //        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
 
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         onNavigationItemSelected(menuItemforRefresh);
                     //if there is not an item selected
                     else
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
                 }
                 //stop refreshing
                 swipeRefreshLayout.setRefreshing(false);
@@ -160,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragment = new SettingsFragment();
                 break;
             case R.id.nav_grades:
-                fragment = new GradesFragment();
+                fragment = new GradesFragment(lessons);
                 break;
             case R.id.nav_uomNews:
                 fragment = new NewsFragment();
@@ -169,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragment = new CompusFragment();
                 break;
             case R.id.nav_program:
-                fragment = new ProgramFragment();
+                fragment = new ProgramFragment(lessons);
                 break;
             case R.id.nav_email:
                 //the default email client will open with the intent
@@ -208,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbarΤitle.setText((String) menuItemforRefresh.getTitle());
             }else {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, new ProgramFragment());
+                ft.replace(R.id.content_frame, new ProgramFragment(lessons));
                 ft.commit();
             }
         }else{
@@ -236,4 +240,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
+
 }
+
+
