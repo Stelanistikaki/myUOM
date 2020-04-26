@@ -2,22 +2,19 @@ package com.example.admin.myuom.Grades;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.admin.myuom.Program.Lesson;
+import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
+import com.example.admin.myuom.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -49,24 +46,24 @@ public class GradesFragment extends Fragment{
         id = sp.getString("id", "");
         direction = sp.getString("direction", "");
         semester = sp.getInt("semester",0);
-        setupViewPager(viewPager);
+        setupViewPagerGrades(viewPager);
 
         return view;
 
     }
 
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPagerGrades(ViewPager viewPager) {
         //create the tabs for the semesters
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new ListGrades(id, 1, lessons), "1");
-        adapter.addFragment(new ListGrades(id, 2, lessons), "2");
-        adapter.addFragment(new ListGrades(id, 3, lessons), "3");
-        adapter.addFragment(new ListGrades(id, 4, lessons), "4");
-        adapter.addFragment(new ListGrades(id, 5, lessons), "5");
-        adapter.addFragment(new ListGrades(id, 6, lessons), "6");
-        adapter.addFragment(new ListGrades(id, 7, lessons), "7");
-        adapter.addFragment(new ListGrades(id, 8, lessons), "8");
-        viewPager.setAdapter(adapter);
+        ViewPagerAdapter gradesAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        gradesAdapter.addFragment(new ListGrades(id, 1, lessons), "1");
+        gradesAdapter.addFragment(new ListGrades(id, 2, lessons), "2");
+        gradesAdapter.addFragment(new ListGrades(id, 3, lessons), "3");
+        gradesAdapter.addFragment(new ListGrades(id, 4, lessons), "4");
+        gradesAdapter.addFragment(new ListGrades(id, 5, lessons), "5");
+        gradesAdapter.addFragment(new ListGrades(id, 6, lessons), "6");
+        gradesAdapter.addFragment(new ListGrades(id, 7, lessons), "7");
+        gradesAdapter.addFragment(new ListGrades(id, 8, lessons), "8");
+        viewPager.setAdapter(gradesAdapter);
         //-1 because it starts from 0
         viewPager.setCurrentItem(semester-1);
     }

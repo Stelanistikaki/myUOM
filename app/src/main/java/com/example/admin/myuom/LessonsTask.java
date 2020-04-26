@@ -1,9 +1,7 @@
 package com.example.admin.myuom;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.example.admin.myuom.Program.Lesson;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;

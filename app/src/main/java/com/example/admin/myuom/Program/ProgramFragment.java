@@ -4,47 +4,23 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
-
-import android.util.Log;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import com.example.admin.myuom.Grades.CustomAdapterList;
-import com.example.admin.myuom.Grades.Grade;
-import com.example.admin.myuom.Notification.AlarmReceiver;
-import com.example.admin.myuom.Notification.NotificationScheduler;
+import com.example.admin.myuom.ViewPagerAdapter;
+import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.IOException;
-import java.io.InputStream;
+import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 
 public class ProgramFragment extends Fragment {
 
-    private ListView programList;
-    private Spinner programSpinner;
     String id;
     int semester;
-    String dayOfWeek;
-    String selectedDay,selectedDay2="",selectedDay3="";
     ArrayList<Lesson> lessons;
-    private String[] programString = {"Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή"};
 
     public ProgramFragment (ArrayList<Lesson> lessons){
         this.lessons = lessons;
@@ -56,43 +32,9 @@ public class ProgramFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_program, container, false);
 
-        programList = view.findViewById(R.id.program_list);
-        programSpinner = view.findViewById(R.id.programSpinner);
-
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
-                (getContext(), android.R.layout.simple_spinner_item, programString);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        programSpinner.setAdapter(spinnerArrayAdapter);
-
-        //set the spinner in the current day
-        Calendar calendar = Calendar.getInstance();
-        dayOfWeek = getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK));
-        int selection = 0;
-        switch (dayOfWeek) {
-            case "ΔΕΥΤΕΡΑ":
-                selectedDay = dayOfWeek;
-                selection = 0;
-                break;
-            case "ΤΡΙΤΗ":
-                selectedDay = dayOfWeek;
-                selection = 1;
-                break;
-            case "ΤΕΤΑΡΤΗ":
-                selectedDay = dayOfWeek;
-                selection = 2;
-                break;
-            case "ΠΕΜΠΤΗ":
-                selectedDay = dayOfWeek;
-                selection = 3;
-                break;
-            case "ΠΑΡΑΣΚΕΥΗ":
-                selectedDay = dayOfWeek;
-                selection = 4;
-                break;
-            default: //the default is for Sunday and Saturday
-                selection=0;
-        }
-        programSpinner.setSelection(selection);
+        ViewPager programViewPager = (ViewPager) view.findViewById(R.id.prog_viewpager);
+        TabLayout programTabLayout = (TabLayout) view.findViewById(R.id.prog_tabs);
+        programTabLayout.setupWithViewPager(programViewPager);
 
         // this = fragment
         //get the shared values to show the correct data
@@ -100,209 +42,32 @@ public class ProgramFragment extends Fragment {
         id = sp.getString("id", "");
         semester = sp.getInt("semester", 0);
 
-        //there are more than one lesson in some days at the same time
-        //thats why the "DAY2" and "DAY3" is used otherwise only the first lesson is gonna appear
-        programSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long iD) {
-                selectedDay = programSpinner.getSelectedItem().toString();
-                if(selectedDay.equals("Δευτέρα")){
-                    selectedDay = "ΔΕΥΤΕΡΑ";
-                    selectedDay2 = "ΔΕΥΤΕΡΑ2";
-                    selectedDay3 = "";
-                }else if(selectedDay.equals("Τρίτη")){
-                    selectedDay = "ΤΡΙΤΗ";
-                    selectedDay2="";
-                    selectedDay3 = "";
-                }else if(selectedDay.equals("Τετάρτη")) {
-                    selectedDay = "ΤΕΤΑΡΤΗ";
-                    selectedDay2 = "ΤΕΤΑΡΤΗ2";
-                    selectedDay3 = "ΤΕΤΑΡΤΗ3";
-                }else if(selectedDay.equals("Πέμπτη")) {
-                    selectedDay = "ΠΕΜΠΤΗ";
-                    selectedDay2 = "";
-                    selectedDay3 = "";
-                }else if(selectedDay.equals("Παρασκευή")) {
-                    selectedDay = "ΠΑΡΑΣΚΕΥΗ";
-                    selectedDay2 = "";
-                    selectedDay3 = "";
-                }
-
-                run(semester,lessons);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        //if the list is empty show the empty view
-        TextView emptyText = view.findViewById(R.id.emptyTextView);
-        programList.setEmptyView(emptyText);
+        setupViewPagerProgram(programViewPager);
 
         return view;
     }
 
-    public void loadList(ArrayList<Lesson> lessons, int semester, ArrayList<String> studentLessons){
-        JSONObject obj = null;
-        JSONObject jsonObject;
-        try {
-            //get the data from the ep7.json file in assets file
-            obj = new JSONObject(loadJSONFromAsset(getContext()));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        ArrayList<Program> data = new ArrayList<>();
-        try {
-            JSONArray jsonArray = obj.getJSONArray("ΠΡΟΓΡΑΜΜΑ");
-            Program theProgram ;
-            for(int j=0; j< studentLessons.size();j++) {
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    jsonObject = jsonArray.getJSONObject(i);
-                    //compare the data in the Lesson list with the data in the json file
-                    if (jsonObject.getString(selectedDay).contains(studentLessons.get(j))) {
-                        //check if the selected day has no lessons
-                        if (!selectedDay.equals("") && !(jsonObject.getString(selectedDay).equals(""))) {
-                            theProgram = new Program();
-                            theProgram.setTime(jsonObject.getString("ΩΡΑ"));
-                            theProgram.setTitle(jsonObject.getString(selectedDay));
-                            data.add(theProgram);
-                        }
-                        //for each day (2 and 3)
-                        else if (!selectedDay2.equals("") && !(jsonObject.getString(selectedDay2).equals(""))) {
-                            Program theProgram2 = new Program();
-                            theProgram2.setTime(jsonObject.getString("ΩΡΑ"));
-                            theProgram2.setTitle(jsonObject.getString(selectedDay2));
-                            data.add(theProgram2);
-                        } else if (!selectedDay3.equals("") && !(jsonObject.getString(selectedDay3).equals(""))) {
-                            Program theProgram3 = new Program();
-                            theProgram3.setTime(jsonObject.getString("ΩΡΑ"));
-                            theProgram3.setTitle(jsonObject.getString(selectedDay3));
-                            data.add(theProgram3);
-                        }
-                    }
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
-        boolean notify = sp.getBoolean("notifications", false);
-        //if the notification switch is on set the notification
-        int timeNotification = sp.getInt("notificationTime", 0);
-        int min,hour;
-        //the notifications should initialize ONLY if its the day of the week
-        //the user might switch to another day but should not get notification
-        if(selectedDay.equals(dayOfWeek) && notify){
-            for(int i=0;i<data.size();i++){
-                String timeString = data.get(i).getTime();
-                String s[] = timeString.split(":");
-                if(timeNotification == 30){
-                    min = Integer.valueOf(s[1])+30;
-                    hour = Integer.valueOf(s[0])-1;
-                }else{
-                    hour = Integer.valueOf(s[0]) - timeNotification;
-                    min = Integer.valueOf(s[1]);
-                }
-                NotificationScheduler notificationScheduler = new NotificationScheduler();
-                //random but UNIQUE id
-                notificationScheduler.setReminder(getActivity(), AlarmReceiver.class, hour, min, i);
-            }
-        }
-
-        //set the list adapter
-        ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override public void run() {
-                programList.setAdapter(adapter);
-            }
-        });
+    private void setupViewPagerProgram(ViewPager viewPager) {
+        //create the tabs for the semesters
+        ViewPagerAdapter programAdapter = new ViewPagerAdapter(getChildFragmentManager());
+        programAdapter.addFragment(new ListProgram(id, semester, lessons, 1), "Δ");
+        programAdapter.addFragment(new ListProgram(id, semester, lessons, 2), "Τρ");
+        programAdapter.addFragment(new ListProgram(id, semester, lessons, 3), "Τε");
+        programAdapter.addFragment(new ListProgram(id, semester, lessons, 4), "Πε");
+        programAdapter.addFragment(new ListProgram(id, semester, lessons, 5), "Πα");
+        viewPager.setAdapter(programAdapter);
+        //-1 because it starts from 0
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int selection;
+        if(dayOfWeek == 1 || dayOfWeek == 7)
+            selection = 0;
+        else
+            //because 1 is Sunday and it starts from 0
+            selection = dayOfWeek-2;
+        viewPager.setCurrentItem(selection);
     }
 
-    public void run(int semester, ArrayList<Lesson> lessons){
-        OkHttpClient client = new OkHttpClient();
-        //after the list of the lessons is filled get the grades for the lessons in the Lesson list
-        Request requestGrade = new Request.Builder().url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id).build();
 
-        client.newCall(requestGrade).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                ArrayList<String> studentLessons = new ArrayList<>();
-                ResponseBody responseBody = response.body();
-                JSONObject obj = null;
-                try {
-                    obj = new JSONObject(responseBody.string());
-                    for(int j=0; j<lessons.size();j++){
-                        if(lessons.get(j).getSemester() == semester){
-                            for(int i=0; i<obj.names().length();i++){
-                                //compare the id of lesson in the Lesson list and the response from the api call
-                                if(obj.names().get(i).toString().equals(lessons.get(j).getId())){
-                                    String id_lesson = obj.names().get(i).toString();
-                                    studentLessons.add(id_lesson);
-                                }
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                loadList(lessons, semester, studentLessons);
-            }
-        });
-
-    }
-
-    public String loadJSONFromAsset(Context context) {
-        String json = null;
-        try {
-            InputStream is = context.getAssets().open("ep_7.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-
-    }
-
-    private String getDayOfWeek(int value) {
-        String day = "";
-        switch (value) {
-            case 1:
-                day = "ΚΥΡΙΑΚΗ";
-                break;
-            case 2:
-                day = "ΔΕΥΤΕΡΑ";
-                break;
-            case 3:
-                day = "ΤΡΙΤΗ";
-                break;
-            case 4:
-                day = "ΤΕΤΑΡΤΗ";
-                break;
-            case 5:
-                day = "ΠΕΜΠΤΗ";
-                break;
-            case 6:
-                day = "ΠΑΡΑΣΚΕΥΗ";
-                break;
-            case 7:
-                day = "ΣΑΒΒΑΤΟ";
-                break;
-        }
-        return day;
-    }
 
 }

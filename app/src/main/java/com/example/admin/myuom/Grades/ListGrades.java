@@ -1,15 +1,13 @@
 package com.example.admin.myuom.Grades;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.admin.myuom.Program.Lesson;
+import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -21,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import androidx.fragment.app.Fragment;
@@ -90,7 +87,7 @@ public class ListGrades extends Fragment {
                         }
                         //set the adapter of the list
                         if(!grades.isEmpty()){
-                            CustomAdapterList adapter = new CustomAdapterList(getContext(), R.layout.grades_list_item, grades);
+                            GradesListAdapter adapter = new GradesListAdapter(getContext(), R.layout.grades_list_item, grades);
                             //not available in fragment so get the activity
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override public void run() {

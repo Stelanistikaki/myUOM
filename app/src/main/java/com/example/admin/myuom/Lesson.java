@@ -1,4 +1,4 @@
-package com.example.admin.myuom.Program;
+package com.example.admin.myuom;
 
 public class Lesson {
 

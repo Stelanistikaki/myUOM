@@ -12,13 +12,13 @@ import com.example.admin.myuom.R;
 
 import java.util.ArrayList;
 
-public class CustomAdapterList extends ArrayAdapter<Grade> {
+public class GradesListAdapter extends ArrayAdapter<Grade> {
     private ArrayList<Grade> dataSet;
     Context mContext;
     int mResource;
 
     //constructor
-    public CustomAdapterList(Context context, int resource, ArrayList<Grade> data) {
+    public GradesListAdapter(Context context, int resource, ArrayList<Grade> data) {
         super(context, R.layout.fragment_grades, data);
         this.dataSet = data;
         this.mContext=context;

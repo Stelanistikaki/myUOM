@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import android.util.Log;
+
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -22,7 +22,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.admin.myuom.Compus.CompusFragment;
 import com.example.admin.myuom.Grades.GradesFragment;
 import com.example.admin.myuom.News.NewsFragment;
-import com.example.admin.myuom.Program.Lesson;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.Settings.SettingsFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -54,15 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         swipeRefreshLayout = findViewById(R.id.pullToRefreshInternet);
 
-        //this gets the lessons from the API
-        // and gives them to the program and grades fragments
-        try {
-            lessons = task.execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         //this checks if the app has been opened
         if (savedInstanceState == null) {
@@ -72,8 +62,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_frame, new NoInternetFragment());
                 ft.commit();
-            }else
+            }else{
+                //this gets the lessons from the API
+                // and gives them to the program and grades fragments
+                try {
+                    lessons = task.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
+            }
         }
 
         //code for the blue color on the status bar
