@@ -15,14 +15,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.MainActivity;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.R;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -30,11 +33,16 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class SettingsFragment extends Fragment {
 
-    TextView aem, firstName, lastName, department, semester, direction;
+    TextView aem, firstName, lastName, department, semester, direction, unpassedNum;
+    ListView unpassedList;
     Spinner timeSpinner;
     Switch notificationSwitch;
     View view;
@@ -52,8 +60,12 @@ public class SettingsFragment extends Fragment {
         department = (TextView) view.findViewById(R.id.department);
         semester = (TextView) view.findViewById(R.id.semester);
         direction = (TextView) view.findViewById(R.id.direction);
+        unpassedList =  view.findViewById(R.id.unpassedLessons);
+        unpassedNum = view.findViewById(R.id.upassedNumber);
         timeSpinner = view.findViewById(R.id.timeSpinner);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
+
+        unpassedList.setClickable(false);
 
         //set the time notification spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
@@ -121,6 +133,8 @@ public class SettingsFragment extends Fragment {
             e.printStackTrace();
         }
 
+        loadList();
+
         return view;
     }
 
@@ -150,6 +164,24 @@ public class SettingsFragment extends Fragment {
                     setView(student);
             }
         });
+    }
+
+    public void loadList(){
+        SharedPreferences sp = getActivity().getSharedPreferences("pref",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sp.getString("unpassed", null);
+        Type type = new TypeToken<ArrayList<Lesson>>() {}.getType();
+        ArrayList<Lesson> unpassed = gson.fromJson(json, type);
+        unpassedNum.setText(String.valueOf(unpassed.size()));
+        if(!unpassed.isEmpty()){
+            UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getContext(), R.layout.unpassed_list_item, unpassed);
+            //not available in fragment so get the activity
+            getActivity().runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    unpassedList.setAdapter(adapter);
+                }
+            });
+        }
     }
 
     public void setView(Student student){

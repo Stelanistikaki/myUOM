@@ -41,5 +41,10 @@
     <string name="empty_text_grades">Δεν έχεις εγγραφεί σε μαθήματα</string>
     <string name="app_name_greek">Πανεπιστήμιο Μακεδονίας</string>
     <string name="no_internet_string">"Δεν υπάρχει σύνδεση στο Internet!</string>
+    <string name="student_info">Στοιχεία Φοιτητή:</string>
+    <string name="unpassedNumberString">Χρωστούμενα Μαθήματα:</string>
+    <string name="notificationTitle">Ρυθμίσεις Ειδοποιήσεων</string>
+    <string name="lesson">Μάθημα</string>
+    <string name="semester">Εξάμηνο</string>
 
 </resources>

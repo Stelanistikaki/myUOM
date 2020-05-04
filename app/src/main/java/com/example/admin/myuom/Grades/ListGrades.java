@@ -1,6 +1,8 @@
 package com.example.admin.myuom.Grades;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,9 @@ import android.widget.TextView;
 
 import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
+import com.example.admin.myuom.Settings.SettingsFragment;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -19,21 +24,26 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import androidx.fragment.app.Fragment;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ListGrades extends Fragment {
     private String id;
     private int semester;
     private ListView gradeList;
     private ArrayList<Lesson> lessons;
+    private ArrayList<Lesson> unpassedLessons;
 
     //constructor
-    public ListGrades(String id, int semester, ArrayList<Lesson> lessons){
+    public ListGrades(String id, int semester, ArrayList<Lesson> lessons, ArrayList<Lesson> unpassedLessons){
         this.id = id;
         this.semester = semester;
         this.lessons = lessons;
+        this.unpassedLessons = unpassedLessons;
     }
 
     @Override
@@ -42,6 +52,7 @@ public class ListGrades extends Fragment {
         View view = inflater.inflate(R.layout.list_grades, container, false);
         gradeList = view.findViewById(R.id.grades_list);
         TextView emptyTextGrades = view.findViewById(R.id.emptyTextViewGrades);
+
         run();
         //if the list is empty show something else
         gradeList.setEmptyView(emptyTextGrades);
@@ -75,8 +86,12 @@ public class ListGrades extends Fragment {
                                             Grade grade = new Grade();
                                             String id_lesson = obj.names().get(i).toString();
                                             grade.setGrade(obj.getString(id_lesson));
+                                            if(grade.getGrade().equals("-") || Integer.parseInt(grade.getGrade()) < 5 )
+                                                if(!unpassedLessons.contains(lessons.get(j)))
+                                                    unpassedLessons.add(lessons.get(j));
                                             grade.setName(lessons.get(j).getName());
                                             grades.add(grade);
+
                                         }
                                     }
                                 }
@@ -85,18 +100,24 @@ public class ListGrades extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        //set the adapter of the list
-                        if(!grades.isEmpty()){
-                            GradesListAdapter adapter = new GradesListAdapter(getContext(), R.layout.grades_list_item, grades);
-                            //not available in fragment so get the activity
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override public void run() {
+                SharedPreferences sp = getActivity().getSharedPreferences("pref",MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(unpassedLessons);
+                editor.putString("unpassed", json).apply();
+
+                //set the adapter of the list
+                if(!grades.isEmpty()){
+                    GradesListAdapter adapter = new GradesListAdapter(getContext(), R.layout.grades_list_item, grades);
+                    //not available in fragment so get the activity
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override public void run() {
                                     gradeList.setAdapter(adapter);
                                 }
-                            });
-                        }
-                    }
-                });
+                    });
+                }
+            }
+        });
 
     }
 }
