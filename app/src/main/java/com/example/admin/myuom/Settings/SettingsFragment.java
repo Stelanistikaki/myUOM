@@ -172,8 +172,8 @@ public class SettingsFragment extends Fragment {
         String json = sp.getString("unpassed", null);
         Type type = new TypeToken<ArrayList<Lesson>>() {}.getType();
         ArrayList<Lesson> unpassed = gson.fromJson(json, type);
-        unpassedNum.setText(String.valueOf(unpassed.size()));
         if(!unpassed.isEmpty()){
+            unpassedNum.setText(String.valueOf(unpassed.size()));
             UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getContext(), R.layout.unpassed_list_item, unpassed);
             //not available in fragment so get the activity
             getActivity().runOnUiThread(new Runnable() {
