@@ -3,6 +3,7 @@ package com.example.admin.myuom.Program;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,7 +114,7 @@ public class ListProgram extends Fragment {
         //the notifications should initialize ONLY if its the day of the week
         //the user might switch to another day but should not get notification
         Calendar calendar = Calendar.getInstance();
-        String dayOfWeek = getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK));
+        String dayOfWeek = getDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)-1);
         if(day.equals(dayOfWeek) && notify){
             for(int i=0;i<data.size();i++){
                 String timeString = data.get(i).getTime();
