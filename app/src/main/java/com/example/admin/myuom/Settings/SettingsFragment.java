@@ -41,7 +41,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SettingsFragment extends Fragment {
 
-    TextView aem, firstName, lastName, department, semester, direction, unpassedNum;
+    TextView aem, firstName, lastName, department, semester, direction, unpassedNum, unpassedEmpty, lessonSettings, semesterSettings;
     ListView unpassedList;
     Spinner timeSpinner;
     Switch notificationSwitch;
@@ -64,8 +64,9 @@ public class SettingsFragment extends Fragment {
         unpassedNum = view.findViewById(R.id.upassedNumber);
         timeSpinner = view.findViewById(R.id.timeSpinner);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
-
-        unpassedList.setClickable(false);
+        unpassedEmpty = view.findViewById(R.id.emptyTextViewSettings);
+        lessonSettings = view.findViewById(R.id.lessonInSettings);
+        semesterSettings = view.findViewById(R.id.semesterInSettings);
 
         //set the time notification spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
@@ -135,6 +136,8 @@ public class SettingsFragment extends Fragment {
 
         loadList();
 
+        unpassedList.setEmptyView(unpassedEmpty);
+
         return view;
     }
 
@@ -181,6 +184,10 @@ public class SettingsFragment extends Fragment {
                     unpassedList.setAdapter(adapter);
                 }
             });
+        }else {
+            lessonSettings.setVisibility(View.INVISIBLE);
+            semesterSettings.setVisibility(View.INVISIBLE);
+            unpassedNum.setText("0");
         }
     }
 

@@ -46,5 +46,6 @@
     <string name="notificationTitle">Ρυθμίσεις Ειδοποιήσεων</string>
     <string name="lesson">Μάθημα</string>
     <string name="semester">Εξάμηνο</string>
+    <string name="empty_text_settings">Δεν χρωστάς κανενα μάθημα!</string>
 
 </resources>
