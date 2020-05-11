@@ -1,12 +1,14 @@
 package com.example.admin.myuom.Grades;
 
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.admin.myuom.Lesson;
@@ -37,6 +39,8 @@ public class ListGrades extends Fragment {
     private ListView gradeList;
     private ArrayList<Lesson> lessons;
     private ArrayList<Lesson> unpassedLessons;
+    private ProgressBar gradesProgressBar;
+    private TextView emptyTextGrades;
 
     //constructor
     public ListGrades(String id, int semester, ArrayList<Lesson> lessons, ArrayList<Lesson> unpassedLessons){
@@ -51,11 +55,11 @@ public class ListGrades extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_grades, container, false);
         gradeList = view.findViewById(R.id.grades_list);
-        TextView emptyTextGrades = view.findViewById(R.id.emptyTextViewGrades);
+        gradesProgressBar = view.findViewById(R.id.grades_progress);
+        emptyTextGrades = view.findViewById(R.id.emptyTextViewGrades);
 
-        run();
-        //if the list is empty show something else
         gradeList.setEmptyView(emptyTextGrades);
+        run();
 
         return view;
     }
@@ -65,6 +69,9 @@ public class ListGrades extends Fragment {
         ArrayList<Grade> grades = new ArrayList<>();
         //after the list of the lessons is filled get the grades for the lessons in the Lesson list
         Request requestGrade = new Request.Builder().url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id).build();
+
+        emptyTextGrades.setVisibility(View.GONE);
+        gradesProgressBar.setVisibility(View.VISIBLE);
 
         client.newCall(requestGrade).enqueue(new Callback() {
             @Override
@@ -112,8 +119,10 @@ public class ListGrades extends Fragment {
                     //not available in fragment so get the activity
                     getActivity().runOnUiThread(new Runnable() {
                         @Override public void run() {
-                                    gradeList.setAdapter(adapter);
-                                }
+                            gradesProgressBar.setVisibility(View.GONE);
+                            emptyTextGrades.setVisibility(View.VISIBLE);
+                            gradeList.setAdapter(adapter);
+                        }
                     });
                 }
             }

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.example.admin.myuom.R;
 import com.google.gson.Gson;
@@ -35,6 +36,7 @@ public class NewsFragment extends Fragment {
 
     private ListView newsList;
     private String link="";
+    private ProgressBar newsProgressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +44,7 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
         newsList = view.findViewById(R.id.news_list);
+        newsProgressBar = view.findViewById(R.id.news_progress);
 
         run();
 
@@ -70,6 +73,8 @@ public class NewsFragment extends Fragment {
                 //rss feed that gives the last 5 (4 visible) news of the news page in uom.gr
                 .url("https://api.rss2json.com/v1/api.json?rss_url=http%3A%2F%2Fcreatefeed.fivefilters.org%2Fextract.php%3Furl%3Dhttps%253A%252F%252Fwww.uom.gr%252Fnea%26in_id_or_class%3Dpost-news-body%26url_contains%3D")
                 .build();
+
+        newsProgressBar.setVisibility(View.VISIBLE);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -107,6 +112,7 @@ public class NewsFragment extends Fragment {
                 NewsListViewAdapter adapter = new NewsListViewAdapter(getContext(), R.layout.fragment_news_list, data);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override public void run() {
+                        newsProgressBar.setVisibility(View.GONE);
                         newsList.setAdapter(adapter);
                     }
                 });

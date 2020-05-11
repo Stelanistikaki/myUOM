@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.admin.myuom.Lesson;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Calendar;
 
 import androidx.fragment.app.Fragment;
@@ -37,6 +40,8 @@ public class ListProgram extends Fragment {
     private int semester;
     private ArrayList<Lesson> lessons;
     private String day, day2, day3;
+    private ProgressBar programProgressBar;
+    private TextView emptyTextProgram;
 
     public ListProgram(String id, int semester, ArrayList<Lesson> lessons, int intDay){
         this.id = id;
@@ -51,10 +56,13 @@ public class ListProgram extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_program, container, false);
         programList = view.findViewById(R.id.program_list);
-        TextView emptyTextProgram = view.findViewById(R.id.emptyTextViewProgram);
-        run(semester, lessons);
+        programProgressBar = view.findViewById(R.id.program_progress);
+        emptyTextProgram = view.findViewById(R.id.emptyTextViewProgram);
+
         //if the list is empty show something else
         programList.setEmptyView(emptyTextProgram);
+
+        run(semester, lessons);
 
         return view;
     }
@@ -136,6 +144,8 @@ public class ListProgram extends Fragment {
         ProgramListAdapter adapter = new ProgramListAdapter(getContext(), R.layout.fragment_program_list, data);
         getActivity().runOnUiThread(new Runnable() {
             @Override public void run() {
+                programProgressBar.setVisibility(View.GONE);
+                emptyTextProgram.setVisibility(View.VISIBLE);
                 programList.setAdapter(adapter);
             }
         });
@@ -145,6 +155,9 @@ public class ListProgram extends Fragment {
         OkHttpClient client = new OkHttpClient();
         //after the list of the lessons is filled get the grades for the lessons in the Lesson list
         Request requestGrade = new Request.Builder().url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/grades/"+id).build();
+
+        emptyTextProgram.setVisibility(View.GONE);
+        programProgressBar.setVisibility(View.VISIBLE);
 
         client.newCall(requestGrade).enqueue(new Callback() {
             @Override
