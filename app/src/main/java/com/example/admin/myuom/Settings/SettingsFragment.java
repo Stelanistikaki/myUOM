@@ -1,21 +1,31 @@
 package com.example.admin.myuom.Settings;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -36,13 +46,14 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 
 public class SettingsFragment extends Fragment {
 
-    TextView aem, firstName, lastName, department, semester, direction, unpassedNum, unpassedEmpty, lessonSettings, semesterSettings;
-    ListView unpassedList;
+    TextView aem, firstName, lastName, department, semester, direction;
+    Button unpassedNum;
     Spinner timeSpinner;
     Switch notificationSwitch;
     View view;
@@ -60,13 +71,10 @@ public class SettingsFragment extends Fragment {
         department = (TextView) view.findViewById(R.id.department);
         semester = (TextView) view.findViewById(R.id.semester);
         direction = (TextView) view.findViewById(R.id.direction);
-        unpassedList =  view.findViewById(R.id.unpassedLessons);
+
         unpassedNum = view.findViewById(R.id.upassedNumber);
         timeSpinner = view.findViewById(R.id.timeSpinner);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
-        unpassedEmpty = view.findViewById(R.id.emptyTextViewSettings);
-        lessonSettings = view.findViewById(R.id.lessonInSettings);
-        semesterSettings = view.findViewById(R.id.semesterInSettings);
 
         //set the time notification spinner
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
@@ -136,7 +144,7 @@ public class SettingsFragment extends Fragment {
 
         loadList();
 
-        unpassedList.setEmptyView(unpassedEmpty);
+        //unpassedList.setEmptyView(unpassedEmpty);
 
         return view;
     }
@@ -177,16 +185,22 @@ public class SettingsFragment extends Fragment {
         ArrayList<Lesson> unpassed = gson.fromJson(json, type);
         if(!unpassed.isEmpty()){
             unpassedNum.setText(String.valueOf(unpassed.size()));
-            UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getContext(), R.layout.unpassed_list_item, unpassed);
-            //not available in fragment so get the activity
-            getActivity().runOnUiThread(new Runnable() {
-                @Override public void run() {
-                    unpassedList.setAdapter(adapter);
-                }
+            unpassedNum.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   Dialog listDialog = new Dialog(getActivity());
+                   listDialog.setTitle("Μάθημα - Εξάμηνο");
+                   LayoutInflater inf = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                   View popList = inf.inflate(R.layout.popuplistunpassed, null, false);
+                   ListView unpassedList = popList.findViewById(R.id.unpassedLessons);
+                   UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getActivity(), R.layout.unpassed_list_item, unpassed);
+                   unpassedList.setAdapter(adapter);
+                   listDialog.setContentView(popList);
+                   listDialog.setCancelable(true);
+                   listDialog.show();
+               }
             });
         }else {
-            lessonSettings.setVisibility(View.INVISIBLE);
-            semesterSettings.setVisibility(View.INVISIBLE);
             unpassedNum.setText("0");
         }
     }

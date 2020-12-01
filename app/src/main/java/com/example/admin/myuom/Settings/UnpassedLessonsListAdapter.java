@@ -1,6 +1,7 @@
 package com.example.admin.myuom.Settings;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +29,8 @@ public class UnpassedLessonsListAdapter extends ArrayAdapter<Lesson> {
         mResource = resource;
     }
 
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         //set up the listview
         Lesson lesson = dataSet.get(position);
 

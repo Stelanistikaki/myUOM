@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         swipeRefreshLayout = findViewById(R.id.pullToRefreshInternet);
-
+        sp = getSharedPreferences("pref", Context.MODE_PRIVATE);
 
         //this checks if the app has been opened
         if (savedInstanceState == null) {
@@ -122,8 +122,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //if there is internet it has to reload the same menu item that it was selected (if it was one clicked)
                 }else{
                     //if the user had selected an item before
-                    if(menuItemforRefresh != null)
-                        onNavigationItemSelected(menuItemforRefresh);
+                    if(menuItemforRefresh != null) {
+                        if (menuItemforRefresh.getItemId() == R.id.nav_settings)
+                            swipeRefreshLayout.setEnabled(false);
+                        else
+                            onNavigationItemSelected(menuItemforRefresh);
+                    }
                     //if there is not an item selected
                     else
                         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
@@ -140,8 +144,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if( menuItemforRefresh == null || menuItemforRefresh.getItemId() == R.id.nav_program ){
             finish();
+        }
+        else{
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
+            menuItemforRefresh = null;
+            toolbarΤitle.setText("Πρόγραμμα");
         }
     }
 
@@ -184,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_logout:
                 //if the user logges out the shared value has to change
                 sp.edit().putBoolean("logged",false).apply();
+                sp.edit().putString("unpassed","").apply();
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

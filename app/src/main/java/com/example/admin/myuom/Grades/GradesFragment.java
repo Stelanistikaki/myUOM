@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class GradesFragment extends Fragment{
 
     private View view;
-    private String id, direction;
+    private String id;
     private int semester;
     private ArrayList<Lesson> lessons;
     private ArrayList<Lesson> unpassed;
@@ -45,7 +45,6 @@ public class GradesFragment extends Fragment{
         SharedPreferences sp = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         //get the shared values
         id = sp.getString("id", "");
-        direction = sp.getString("direction", "");
         semester = sp.getInt("semester",0);
 
         unpassed = new ArrayList<>();
