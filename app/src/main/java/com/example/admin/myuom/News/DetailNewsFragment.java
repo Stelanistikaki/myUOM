@@ -9,13 +9,16 @@ import android.webkit.WebView;
 import com.example.admin.myuom.R;
 
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class DetailNewsFragment extends Fragment {
     private String link;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     //detailed view with webview for news
-    public DetailNewsFragment(String link){
+    public DetailNewsFragment(String link, SwipeRefreshLayout swipeRefreshLayout){
         this.link = link;
+        this.swipeRefreshLayout = swipeRefreshLayout;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,6 +31,8 @@ public class DetailNewsFragment extends Fragment {
 
         //Specify the URL you want to display//
         webView.loadUrl(link);
+
+        swipeRefreshLayout.setEnabled(false);
 
         return view;
     }

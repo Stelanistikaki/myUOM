@@ -37,6 +37,11 @@ public class NewsFragment extends Fragment {
     private ListView newsList;
     private String link="";
     private ProgressBar newsProgressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    public NewsFragment(SwipeRefreshLayout swipeRefreshLayout) {
+        this.swipeRefreshLayout = swipeRefreshLayout;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,7 +60,7 @@ public class NewsFragment extends Fragment {
                 //send the link of the item to detailed view
                 Post aPost =(Post) parent.getItemAtPosition(position);
                 link = aPost.getLink();
-                Fragment fragment = new DetailNewsFragment(link);
+                Fragment fragment = new DetailNewsFragment(link, swipeRefreshLayout);
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.content_frame, fragment);
