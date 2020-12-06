@@ -38,16 +38,14 @@ public class ListGrades extends Fragment {
     private int semester;
     private ListView gradeList;
     private ArrayList<Lesson> lessons;
-    private ArrayList<Lesson> unpassedLessons;
     private ProgressBar gradesProgressBar;
     private TextView emptyTextGrades;
 
     //constructor
-    public ListGrades(String id, int semester, ArrayList<Lesson> lessons, ArrayList<Lesson> unpassedLessons){
+    public ListGrades(String id, int semester, ArrayList<Lesson> lessons){
         this.id = id;
         this.semester = semester;
         this.lessons = lessons;
-        this.unpassedLessons = unpassedLessons;
     }
 
     @Override
@@ -93,9 +91,6 @@ public class ListGrades extends Fragment {
                                             Grade grade = new Grade();
                                             String id_lesson = obj.names().get(i).toString();
                                             grade.setGrade(obj.getString(id_lesson));
-                                            if(grade.getGrade().equals("-") || Integer.parseInt(grade.getGrade()) < 5 )
-                                                if(!unpassedLessons.contains(lessons.get(j)))
-                                                    unpassedLessons.add(lessons.get(j));
                                             grade.setName(lessons.get(j).getName());
                                             grades.add(grade);
 
@@ -107,11 +102,6 @@ public class ListGrades extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                SharedPreferences sp = getActivity().getSharedPreferences("pref",MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                Gson gson = new Gson();
-                String json = gson.toJson(unpassedLessons);
-                editor.putString("unpassed", json).apply();
 
                 //set the adapter of the list
                 if(!grades.isEmpty()){

@@ -43,6 +43,7 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -57,6 +58,11 @@ public class SettingsFragment extends Fragment {
     Spinner timeSpinner;
     Switch notificationSwitch;
     View view;
+    ArrayList<Lesson> unpassedLessons;
+
+    public SettingsFragment(ArrayList<Lesson> unpassed){
+        this.unpassedLessons = unpassed;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -142,7 +148,7 @@ public class SettingsFragment extends Fragment {
             e.printStackTrace();
         }
 
-        loadList();
+        loadList(unpassedLessons);
 
         //unpassedList.setEmptyView(unpassedEmpty);
 
@@ -177,14 +183,9 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    public void loadList(){
-        SharedPreferences sp = getActivity().getSharedPreferences("pref",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sp.getString("unpassed", null);
-        Type type = new TypeToken<ArrayList<Lesson>>() {}.getType();
-        ArrayList<Lesson> unpassed = gson.fromJson(json, type);
-        if(!unpassed.isEmpty()){
-            unpassedNum.setText(String.valueOf(unpassed.size()));
+    public void loadList(ArrayList<Lesson> unpassedLessons){
+        if(!unpassedLessons.isEmpty()){
+            unpassedNum.setText(String.valueOf(unpassedLessons.size()));
             unpassedNum.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
@@ -193,7 +194,7 @@ public class SettingsFragment extends Fragment {
                    LayoutInflater inf = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                    View popList = inf.inflate(R.layout.popuplistunpassed, null, false);
                    ListView unpassedList = popList.findViewById(R.id.unpassedLessons);
-                   UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getActivity(), R.layout.unpassed_list_item, unpassed);
+                   UnpassedLessonsListAdapter adapter = new UnpassedLessonsListAdapter(getActivity(), R.layout.unpassed_list_item, unpassedLessons);
                    unpassedList.setAdapter(adapter);
                    listDialog.setContentView(popList);
                    listDialog.setCancelable(true);

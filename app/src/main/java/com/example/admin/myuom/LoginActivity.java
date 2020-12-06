@@ -95,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response response) throws IOException {
                 String thePassword = null;
-                Intent intent;
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
                     try {
@@ -112,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                         sp.edit().putBoolean("logged",true).apply();
                         sp.edit().putString("id", username).apply();
                         //this has to be here to update the sharedpreferences if another user logs in
-                        new SettingsFragment().run(sp.getString("id", ""), false, sp);
+                        new SettingsFragment(null).run(sp.getString("id", ""), false, sp);
                         goToMainActivity();
                         finish();
                     }else{

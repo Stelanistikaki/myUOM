@@ -24,7 +24,6 @@ public class GradesFragment extends Fragment{
     private String id;
     private int semester;
     private ArrayList<Lesson> lessons;
-    private ArrayList<Lesson> unpassed;
 
 
     public GradesFragment(ArrayList<Lesson> lessons) {
@@ -47,8 +46,6 @@ public class GradesFragment extends Fragment{
         id = sp.getString("id", "");
         semester = sp.getInt("semester",0);
 
-        unpassed = new ArrayList<>();
-
         setupViewPagerGrades(viewPager);
 
         return view;
@@ -58,14 +55,14 @@ public class GradesFragment extends Fragment{
     private void setupViewPagerGrades(ViewPager viewPager) {
         //create the tabs for the semesters
         ViewPagerAdapter gradesAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        gradesAdapter.addFragment(new ListGrades(id, 1, lessons, unpassed), "1");
-        gradesAdapter.addFragment(new ListGrades(id, 2, lessons, unpassed), "2");
-        gradesAdapter.addFragment(new ListGrades(id, 3, lessons, unpassed), "3");
-        gradesAdapter.addFragment(new ListGrades(id, 4, lessons, unpassed), "4");
-        gradesAdapter.addFragment(new ListGrades(id, 5, lessons, unpassed), "5");
-        gradesAdapter.addFragment(new ListGrades(id, 6, lessons, unpassed), "6");
-        gradesAdapter.addFragment(new ListGrades(id, 7, lessons, unpassed), "7");
-        gradesAdapter.addFragment(new ListGrades(id, 8, lessons, unpassed), "8");
+        gradesAdapter.addFragment(new ListGrades(id, 1, lessons), "1");
+        gradesAdapter.addFragment(new ListGrades(id, 2, lessons), "2");
+        gradesAdapter.addFragment(new ListGrades(id, 3, lessons), "3");
+        gradesAdapter.addFragment(new ListGrades(id, 4, lessons), "4");
+        gradesAdapter.addFragment(new ListGrades(id, 5, lessons), "5");
+        gradesAdapter.addFragment(new ListGrades(id, 6, lessons), "6");
+        gradesAdapter.addFragment(new ListGrades(id, 7, lessons), "7");
+        gradesAdapter.addFragment(new ListGrades(id, 8, lessons), "8");
         viewPager.setAdapter(gradesAdapter);
         //-1 because it starts from 0
         viewPager.setCurrentItem(semester-1);
