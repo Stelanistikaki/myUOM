@@ -16,4 +16,11 @@
 
     <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!--style to show the title for the unpassed lessons popup window -->
+    <style name="Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
 </resources>

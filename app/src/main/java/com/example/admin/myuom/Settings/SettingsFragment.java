@@ -189,7 +189,7 @@ public class SettingsFragment extends Fragment {
             unpassedNum.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                   Dialog listDialog = new Dialog(getActivity());
+                   Dialog listDialog = new Dialog(getActivity(), R.style.Dialog);
                    listDialog.setTitle("Μάθημα - Εξάμηνο");
                    LayoutInflater inf = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                    View popList = inf.inflate(R.layout.popuplistunpassed, null, false);
