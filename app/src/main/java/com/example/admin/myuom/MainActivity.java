@@ -1,5 +1,6 @@
 package com.example.admin.myuom;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
+import android.util.Log;
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,6 +23,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.admin.myuom.Compus.CompusFragment;
 import com.example.admin.myuom.Grades.GradesFragment;
+import com.example.admin.myuom.Grades.GradesTask;
 import com.example.admin.myuom.News.NewsFragment;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.Settings.SettingsFragment;
@@ -30,6 +33,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -43,7 +48,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MenuItem menuItemforRefresh ;
     SharedPreferences sp;
     ArrayList<Lesson> lessons;
+    ArrayList<Lesson> unpassedLessons;
     LessonsTask task = new LessonsTask();
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -67,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // and gives them to the program and grades fragments
                 try {
                     lessons = task.execute().get();
+                    GradesTask unpassedTask = new GradesTask(sp.getString("id", ""), lessons, sp.getInt("semester", 0));
+                    unpassedLessons = unpassedTask.execute().get();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -123,10 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     //if the user had selected an item before
                     if(menuItemforRefresh != null) {
-                        if (menuItemforRefresh.getItemId() == R.id.nav_settings)
-                            swipeRefreshLayout.setEnabled(false);
-                        else
-                            onNavigationItemSelected(menuItemforRefresh);
+                        onNavigationItemSelected(menuItemforRefresh);
                     }
                     //if there is not an item selected
                     else
@@ -171,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //initializing the fragment object which is selected
         switch (menuItem.getItemId()) {
             case R.id.nav_settings:
-                fragment = new SettingsFragment();
+                fragment = new SettingsFragment(unpassedLessons);
                 break;
             case R.id.nav_grades:
                 fragment = new GradesFragment(lessons);
@@ -186,21 +192,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragment = new ProgramFragment(lessons);
                 break;
             case R.id.nav_email:
-                //the default email client will open with the intent
                 intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
             case R.id.nav_logout:
                 //if the user logges out the shared value has to change
                 sp.edit().putBoolean("logged",false).apply();
-                sp.edit().putString("unpassed","").apply();
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
         }
         //the email does not have a UI in the app so the previous selected item will remain
-        if(menuItem.getItemId() != R.id.nav_email && menuItem.getItemId() != R.id.nav_logout)
+        if( menuItem.getItemId() != R.id.nav_logout && menuItem.getItemId() != R.id.nav_email)
             menuItemforRefresh = menuItem;
 
         //if the user chooses anything but the compus (which is webview with zoom option)
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //this is for the email selection | it will keep showing the program
         }else if(fragment == null){
             //this is for the case that the user has not selected another menu item only the email (first)
-            if(menuItemforRefresh != null){
+            if(menuItemforRefresh != null && menuItemforRefresh.getItemId() != R.id.nav_email){
                 onNavigationItemSelected(menuItemforRefresh);
                 toolbarΤitle.setText((String) menuItemforRefresh.getTitle());
             }else {
