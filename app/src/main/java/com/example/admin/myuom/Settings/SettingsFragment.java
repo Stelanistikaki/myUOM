@@ -124,7 +124,9 @@ public class SettingsFragment extends Fragment {
         if(notificationsBool){
             notificationSwitch.setChecked(true);
         }else {
+            //every time check if notifications are enabled and adjust options accordingly
             notificationSwitch.setChecked(false);
+            timeSpinner.setEnabled(false);
         }
 
         //the time spinner to choose the notification time
@@ -149,8 +151,6 @@ public class SettingsFragment extends Fragment {
         }
 
         loadList(unpassedLessons);
-
-        //unpassedList.setEmptyView(unpassedEmpty);
 
         return view;
     }
