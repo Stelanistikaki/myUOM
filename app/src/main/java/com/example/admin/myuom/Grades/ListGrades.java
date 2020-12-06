@@ -104,19 +104,15 @@ public class ListGrades extends Fragment {
                         }
 
                 //set the adapter of the list
-                if(!grades.isEmpty()){
-                    GradesListAdapter adapter = new GradesListAdapter(getContext(), R.layout.grades_list_item, grades);
-                    //not available in fragment so get the activity
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override public void run() {
-                            gradesProgressBar.setVisibility(View.GONE);
-                            emptyTextGrades.setVisibility(View.VISIBLE);
-                            gradeList.setAdapter(adapter);
-                        }
-                    });
-                }
+                GradesListAdapter adapter = new GradesListAdapter(getContext(), R.layout.grades_list_item, grades);//not available in fragment so get the activity
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        gradesProgressBar.setVisibility(View.GONE);
+                        emptyTextGrades.setVisibility(View.VISIBLE);
+                        gradeList.setAdapter(adapter);
+                    }
+                });
             }
         });
-
     }
 }
