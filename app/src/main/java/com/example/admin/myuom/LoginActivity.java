@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +17,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.admin.myuom.Settings.SettingsFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
@@ -32,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     // UI references.
     private EditText mPasswordView, mUsernameView;
     private Button loginButton;
+    private  FirebaseAuth mAuth;
     SharedPreferences sp;
 
 
@@ -40,6 +50,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
         //shared boolean reference
         sp = getSharedPreferences("pref",MODE_PRIVATE);
@@ -60,14 +73,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isOnline()) {
-                    String username = mUsernameView.getText().toString();
+                    String email = mUsernameView.getText().toString();
                     String password = mPasswordView.getText().toString();
-
-                    try {
-                        run(username, password);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    authenticateUser(email, password);
                 }else
                     Toast.makeText(LoginActivity.this, "Δεν υπάρχει σύνδεση στο Internet!", Toast.LENGTH_SHORT).show();
             }
@@ -79,54 +87,36 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    //get the data from database with api call
-    public void run(String username, String password) throws Exception {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/login/"+ username)
-                .build();
+    public void authenticateUser(String email, String password){
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                String thePassword = null;
-                try (ResponseBody responseBody = response.body()) {
-                    if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-                    try {
-                        JSONObject jsonResponse = new JSONObject(responseBody.string());
-                        thePassword = jsonResponse.getString("password");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String text;
-                    //password from textview equals to password from database
-                    if(password.equals(thePassword)){
-                        text = "Επιτυχής σύνδεση! ";
-                        //set the shared preference values for the other activities
-                        sp.edit().putBoolean("logged",true).apply();
-                        sp.edit().putString("id", username).apply();
-                        //this has to be here to update the sharedpreferences if another user logs in
-                        new SettingsFragment(null).run(sp.getString("id", ""), false, sp);
-                        goToMainActivity();
-                        finish();
-                    }else{
-                        //the credentials are wrong
-                        text = "Tα στοιχεία σου είναι λάθος ";
-                    }
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        String text ;
+                        if (task.isSuccessful()) {
+                            //password from textview equals to password from database
+                            text = "Επιτυχής σύνδεση! ";
+                            //set the shared preference values for the other activities
+                            sp.edit().putBoolean("logged",true).apply();
+                            String id;
+                            id = email.split("@")[0];
+                            sp.edit().putString("id", id).apply();
+                            //this has to be here to update the sharedpreferences if another user logs in
+                            new SettingsFragment(null).run(sp.getString("id", ""), false, sp);
+                            goToMainActivity();
+                            finish();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            text = "Tα στοιχεία σου είναι λάθος ";
                         }
-                    });
-
-                }
-            }
-        });
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(LoginActivity.this, text, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
     }
 
     public boolean isOnline() {
