@@ -185,6 +185,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_uomNews:
                 fragment = new NewsFragment(swipeRefreshLayout);
                 break;
+            case R.id.nav_tweet:
+                fragment = new TweetFragment();
+                break;
             case R.id.nav_compus:
                 fragment = new CompusFragment();
                 break;

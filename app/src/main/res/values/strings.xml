@@ -27,6 +27,7 @@
     <string name="default_notification_channel_id">1</string>
 
     <string name="menu_uomNews">Νέα ΠαΜακ</string>
+    <string name="menu_tweets">Tweets</string>
     <string name="menu_compus">Compus</string>
     <string name="menu_grades">Βαθμοί</string>
     <string name="menu_email">Email</string>

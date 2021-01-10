@@ -6,23 +6,27 @@
     <group>
         <item
             android:id="@+id/nav_program"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/clock"
             android:title="@string/menu_program" />
         <item
             android:id="@+id/nav_uomNews"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/news"
             android:title="@string/menu_uomNews" />
         <item
+            android:id="@+id/nav_tweet"
+            android:icon="@drawable/twitterlogo"
+            android:title="@string/menu_tweets" />
+        <item
             android:id="@+id/nav_compus"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/c"
             android:title="@string/menu_compus" />
         <item
             android:id="@+id/nav_grades"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/grades"
             android:title="@string/menu_grades" />
         <item
             android:id="@+id/nav_email"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/emailogo"
             android:title="@string/menu_email" />
     </group>
 
@@ -30,11 +34,11 @@
         <menu>
             <item
                 android:id="@+id/nav_settings"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/settings"
                 android:title="@string/menu_settings" />
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/logout"
                 android:title="@string/menu_logout" />
         </menu>
     </item>
