@@ -55,13 +55,13 @@ public class TweetFragment extends Fragment {
     }
 
     public void run(){
-
+        Log.d("STELA1", "Bearer "+  getString(R.string.bearer_token));
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://api.twitter.com/2/users/2874870377/tweets?tweet.fields=created_at&expansions=author_id&user.fields=created_at&max_results=100")
                 .method("GET", null)
-                .addHeader("Cookie", "personalization_id=\"v1_fsuYZxapecZ4+w69C0I8KA==\"; guest_id=v1%3A160866147300326878")
-                .addHeader("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAD2OKwEAAAAAKGTEVtcnPVUrpMCbOa7F5lb1ggc%3Dpzrj8Ryptw7OQOrilJKavN6stZ0jKViAv2aqioO074kiIOgyzo")
+                .addHeader("Cookie", getString(R.string.cookies))
+                .addHeader("Authorization", "Bearer "+ getString(R.string.bearer_token))
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
