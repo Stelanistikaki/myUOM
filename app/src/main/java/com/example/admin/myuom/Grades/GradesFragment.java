@@ -5,16 +5,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
 import com.example.admin.myuom.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
-
 import java.util.ArrayList;
 
 
@@ -23,6 +20,7 @@ public class GradesFragment extends Fragment{
     private View view;
     private String id;
     private int semester;
+    //the list with all the lessons available
     private ArrayList<Lesson> lessons;
 
 
@@ -45,7 +43,7 @@ public class GradesFragment extends Fragment{
         //get the shared values
         id = sp.getString("id", "");
         semester = sp.getInt("semester",0);
-
+        //set up the tabs in the view pager
         setupViewPagerGrades(viewPager);
 
         return view;

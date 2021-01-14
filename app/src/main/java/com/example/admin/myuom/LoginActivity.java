@@ -5,36 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.example.admin.myuom.Settings.SettingsFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.IOException;
-
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -73,8 +55,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isOnline()) {
+                    //get the email and password from the user screen
                     String email = mUsernameView.getText().toString();
                     String password = mPasswordView.getText().toString();
+                    //call the firebase method to authenticate
                     authenticateUser(email, password);
                 }else
                     Toast.makeText(LoginActivity.this, "Δεν υπάρχει σύνδεση στο Internet!", Toast.LENGTH_SHORT).show();
@@ -88,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void authenticateUser(String email, String password){
-
+        //use the method from firebase api to authenticate already existing users in the database
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -100,7 +84,9 @@ public class LoginActivity extends AppCompatActivity {
                             //set the shared preference values for the other activities
                             sp.edit().putBoolean("logged",true).apply();
                             String id;
+                            //get from the email the id to use for the user
                             id = email.split("@")[0];
+                            //share it with the app
                             sp.edit().putString("id", id).apply();
                             //this has to be here to update the sharedpreferences if another user logs in
                             new SettingsFragment(null).run(sp.getString("id", ""), false, sp);
@@ -118,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
-
+    //method to check if the user has internet connection
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();

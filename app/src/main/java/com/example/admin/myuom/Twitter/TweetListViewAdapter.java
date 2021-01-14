@@ -1,4 +1,4 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Twitter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import com.example.admin.myuom.R;
+
 import java.util.ArrayList;
 
 class TweetListViewAdapter extends ArrayAdapter<Tweet> {
@@ -35,6 +37,7 @@ class TweetListViewAdapter extends ArrayAdapter<Tweet> {
 
         tweetText.setOnClickListener(new View.OnClickListener() {
             @Override
+            //when the users clicks on an item in the list he will be landed to this post in the browser
             public void onClick(View v) {
                 String url = "https://twitter.com/univofmacedonia/status/"+tweet.getId();
                 Intent i = new Intent(Intent.ACTION_VIEW);

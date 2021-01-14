@@ -1,7 +1,6 @@
 package com.example.admin.myuom;
 
 import android.os.AsyncTask;
-
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -16,6 +15,7 @@ class LessonsTask extends AsyncTask<Void, Void, ArrayList<Lesson>> {
 
     @Override
     protected ArrayList<Lesson> doInBackground(Void... voids) {
+        //call the endpoint for the lessons
         OkHttpClient client = new OkHttpClient();
         Request requestLessons = new Request.Builder()
                 .url("https://us-central1-myuom-f49f5.cloudfunctions.net/app/api/lessons")
@@ -27,13 +27,14 @@ class LessonsTask extends AsyncTask<Void, Void, ArrayList<Lesson>> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //get the response
         ResponseBody responseBody = response.body();
         if (!response.isSuccessful()) try {
             throw new IOException("Unexpected code " + response);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //get each lesson from the response and add them in a list
         try {
             JSONObject lessonsObj = new JSONObject(responseBody.string());
             //for the lessons that are available get the values and make Lessons objects
@@ -49,6 +50,7 @@ class LessonsTask extends AsyncTask<Void, Void, ArrayList<Lesson>> {
         } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
+        //return the list
         return lessons;
     }
 }

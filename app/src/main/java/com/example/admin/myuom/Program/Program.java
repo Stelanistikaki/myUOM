@@ -5,7 +5,8 @@ class Program {
     //class to set the Program values
 
     private String title, time, classroom;
-
+    //the time should start from the first hour
+    //it is given like: 9-11 -> "9:00"
     public void setTime(String time) {
         String theTime[] = time.split(" -");
         this.time = theTime[0]+ ":00";

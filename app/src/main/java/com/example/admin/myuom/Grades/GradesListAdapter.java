@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.example.admin.myuom.R;
-
 import java.util.ArrayList;
 
 public class GradesListAdapter extends ArrayAdapter<Grade> {

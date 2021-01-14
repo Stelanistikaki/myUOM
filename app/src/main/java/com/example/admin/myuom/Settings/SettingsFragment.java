@@ -3,52 +3,29 @@ package com.example.admin.myuom.Settings;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import com.example.admin.myuom.Lesson;
-import com.example.admin.myuom.MainActivity;
-import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.R;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static android.content.Context.MODE_PRIVATE;
 
 
 public class SettingsFragment extends Fragment {
@@ -189,6 +166,7 @@ public class SettingsFragment extends Fragment {
             unpassedNum.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
+                   //when the user clicks the unpassed lessons button a popup list has to appear
                    Dialog listDialog = new Dialog(getActivity(), R.style.Dialog);
                    listDialog.setTitle("Μάθημα - Εξάμηνο");
                    LayoutInflater inf = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

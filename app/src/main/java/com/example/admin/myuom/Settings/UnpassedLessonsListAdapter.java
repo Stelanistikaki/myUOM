@@ -1,20 +1,14 @@
 package com.example.admin.myuom.Settings;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.admin.myuom.Lesson;
 import com.example.admin.myuom.R;
-
 import java.util.ArrayList;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class UnpassedLessonsListAdapter extends ArrayAdapter<Lesson> {
     private ArrayList<Lesson> dataSet;

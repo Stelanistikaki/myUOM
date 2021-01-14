@@ -3,10 +3,10 @@ package com.example.admin.myuom;
 public class Lesson {
 
     //class for Lesson values
-
     private String name, id_lesson;
     private int semester;
 
+    //getters and setters for the parameters
     public String getName() {
         return name;
     }

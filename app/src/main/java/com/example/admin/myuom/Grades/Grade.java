@@ -6,6 +6,7 @@ public class Grade {
 
     private String name, grade;
 
+    //getters and setters for the parameters
     public String getName() {
         return name;
     }

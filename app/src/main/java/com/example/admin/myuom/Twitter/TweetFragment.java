@@ -1,18 +1,14 @@
-package com.example.admin.myuom;
+package com.example.admin.myuom.Twitter;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
-import com.example.admin.myuom.News.NewsListViewAdapter;
-import com.example.admin.myuom.News.Post;
+import com.example.admin.myuom.R;
+import com.example.admin.myuom.Twitter.Tweet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Callback;
@@ -27,8 +23,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import androidx.fragment.app.Fragment;
@@ -56,6 +50,7 @@ public class TweetFragment extends Fragment {
 
     public void run(){
         OkHttpClient client = new OkHttpClient();
+        //get data from endpoint with hidden bearer token and cookies
         Request request = new Request.Builder()
                 .url("https://api.twitter.com/2/users/2874870377/tweets?tweet.fields=created_at&expansions=author_id&user.fields=created_at&max_results=100")
                 .method("GET", null)
@@ -73,7 +68,7 @@ public class TweetFragment extends Fragment {
             public void onResponse(Response response) throws IOException {
                 ResponseBody responseBody = response.body();
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
+                //list with the tweets
                 ArrayList<Tweet> data = null;
 
                 try {

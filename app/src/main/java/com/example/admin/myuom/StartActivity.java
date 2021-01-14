@@ -9,7 +9,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 public class StartActivity extends AppCompatActivity {
-
+    //the activity to handle the splash screen at the beginning of the app
     int SPLASH_TIME = 2000; //This is 2 seconds
     Animation animFadeout;
     private ImageView logoView;

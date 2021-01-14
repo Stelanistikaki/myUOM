@@ -22,10 +22,6 @@ class Student {
         this.semester = semester;
     }
 
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
     public String getFirstName() {
         return first_name;
     }

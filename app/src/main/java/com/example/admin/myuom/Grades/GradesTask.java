@@ -1,29 +1,21 @@
 package com.example.admin.myuom.Grades;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.view.View;
-
 import com.example.admin.myuom.Lesson;
-import com.example.admin.myuom.R;
-import com.google.gson.Gson;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.content.Context.MODE_PRIVATE;
 
 public class GradesTask extends AsyncTask<Void, Void, ArrayList<Lesson>> {
     private String id;
-    ArrayList<Lesson> lessons = new ArrayList<Lesson>();
+    ArrayList<Lesson> lessons;
     private int semester;
 
     public GradesTask(String id, ArrayList<Lesson> lessons, int semester){

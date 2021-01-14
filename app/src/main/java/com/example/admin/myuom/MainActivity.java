@@ -1,6 +1,5 @@
 package com.example.admin.myuom;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,12 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-
-import android.util.Log;
 import android.view.MenuItem;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,14 +25,15 @@ import com.example.admin.myuom.Grades.GradesTask;
 import com.example.admin.myuom.News.NewsFragment;
 import com.example.admin.myuom.Program.ProgramFragment;
 import com.example.admin.myuom.Settings.SettingsFragment;
+import com.example.admin.myuom.Twitter.TweetFragment;
 import com.google.android.material.navigation.NavigationView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayList<Lesson> lessons;
     ArrayList<Lesson> unpassedLessons;
     LessonsTask task = new LessonsTask();
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -87,13 +85,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //code for the blue color on the status bar
         //not working with older os
-//        Window window = this.getWindow();
-//        // clear FLAG_TRANSLUCENT_STATUS flag:
-//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//        // finally change the color
-//        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
+        Window window = this.getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        // finally change the color
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
 
         //set the navigation drawer
         toolbarΤitle = (TextView) findViewById(R.id.titleToolbar);
@@ -147,13 +145,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //on back button pressed closes the drawer or the app
     @Override
     public void onBackPressed() {
+        //if the menu drawer is open the back button closes it
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
+        //else if the drawer is not open the app finishes
         else if( menuItemforRefresh == null || menuItemforRefresh.getItemId() == R.id.nav_program ){
             finish();
         }
+        //if the user has navigated to another page the back button returns to the program (main screen)
         else{
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new ProgramFragment(lessons)).commit();
             menuItemforRefresh = null;
