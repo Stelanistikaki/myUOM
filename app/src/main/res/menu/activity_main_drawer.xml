@@ -21,6 +21,10 @@
             android:icon="@drawable/c"
             android:title="@string/menu_compus" />
         <item
+            android:id="@+id/nav_openeclass"
+            android:icon="@drawable/c"
+            android:title="@string/menu_openeclass" />
+        <item
             android:id="@+id/nav_grades"
             android:icon="@drawable/grades"
             android:title="@string/menu_grades" />

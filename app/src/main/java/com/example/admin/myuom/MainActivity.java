@@ -33,6 +33,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //when an item in drawer is selected a new fragment loads
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         Intent intent;
@@ -192,6 +195,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_compus:
                 fragment = new CompusFragment();
                 break;
+            case R.id.nav_openeclass:
+                fragment = new OpenEclassFragment(swipeRefreshLayout);
+                break;
             case R.id.nav_program:
                 fragment = new ProgramFragment(lessons);
                 break;
@@ -202,7 +208,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
                 break;
             case R.id.nav_logout:
-                //if the user logges out the shared value has to change
+                //this is used for the open eclass cookies
+                //only if the user signs out from the app
+                clearCookies();
                 sp.edit().putBoolean("logged",false).apply();
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -259,6 +267,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public void clearCookies () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //clean the cookies from open eclass view and log out the user who was before logged in
+            CookieManager.getInstance().removeAllCookies(null);
+            CookieManager.getInstance().flush();
+        }
     }
 
 }
